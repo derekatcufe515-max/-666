@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A题 过滤设备监测 · 建模作战地图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --paper-2:#F3ECDD;
+    --ink:#15202B;
+    --ink-2:#3D4B5A;
+    --ink-3:#7A8593;
+    --rule:#D9CFBC;
+    --rule-2:#E8DFC9;
+    --accent:#8B2E1F;       /* 深赤铜 */
+    --accent-2:#B85A3C;     /* 赭石 */
+    --ochre:#C08A3E;        /* 黄橙 */
+    --olive:#4E5D3A;        /* 橄榄 */
+    --ink-soft:#27313D;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans SC','PingFang SC','Helvetica Neue',sans-serif;
+    font-size:15px;
+    line-height:1.75;
+    font-feature-settings:"palt";
+    background-image:
+      radial-gradient(1px 1px at 25% 30%, rgba(21,32,43,.04) 50%, transparent 50%),
+      radial-gradient(1px 1px at 75% 70%, rgba(21,32,43,.03) 50%, transparent 50%);
+    background-size: 12px 12px, 20px 20px;
+  }
+  /* ====== 整体布局 ====== */
+  .shell{
+    display:grid;
+    grid-template-columns: 240px minmax(0,1fr);
+    max-width:1360px;
+    margin:0 auto;
+    gap:0;
+  }
+  /* ====== 侧边导航 ====== */
+  nav.toc{
+    position:sticky; top:0; height:100vh;
+    padding:40px 24px 40px 40px;
+    border-right:1px solid var(--rule);
+    overflow-y:auto;
+    background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  }
+  nav.toc .brand{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:11px;
+    letter-spacing:.28em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  nav.toc .brand-sub{
+    font-family:'Noto Serif SC',serif;
+    font-size:12px;
+    color:var(--ink-3);
+    letter-spacing:.08em;
+    margin-bottom:28px;
+  }
+  nav.toc ol{
+    list-style:none; padding:0; margin:0;
+    counter-reset: tocnum;
+  }
+  nav.toc li{
+    counter-increment: tocnum;
+    margin-bottom:2px;
+  }
+  nav.toc a{
+    display:flex; align-items:baseline; gap:10px;
+    padding:8px 10px 8px 0;
+    text-decoration:none;
+    color:var(--ink-2);
+    font-size:13px;
+    border-bottom:1px dashed transparent;
+    transition: all .2s ease;
+  }
+  nav.toc a::before{
+    content: counter(tocnum,cjk-ideographic) "、";
+    font-family:'Noto Serif SC',serif;
+    font-weight:500;
+    color:var(--accent);
+    font-size:12px;
+    min-width:36px;
+    letter-spacing:.02em;
+  }
+  nav.toc a:hover{
+    color:var(--accent);
+    border-bottom-color:var(--accent);
+  }
+
+  /* ====== 主体 ====== */
+  main{
+    padding:56px 72px 120px 72px;
+    max-width:100%;
+  }
+  /* ====== 头部 ====== */
+  .masthead{
+    border-top:2px solid var(--ink);
+    border-bottom:1px solid var(--ink);
+    padding:18px 0 20px 0;
+    margin-bottom:40px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Fraunces',serif;
+    font-size:11px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-2);
+  }
+  .masthead .issue{color:var(--accent);font-weight:800}
+
+  .hero{
+    margin-bottom:56px;
+  }
+  .kicker{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:15px;
+    color:var(--accent);
+    letter-spacing:.08em;
+    margin-bottom:10px;
+  }
+  h1.title{
+    font-family:'Noto Serif SC',serif;
+    font-weight:900;
+    font-size:clamp(40px, 5.2vw, 68px);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin:0 0 20px 0;
+    color:var(--ink);
+  }
+  h1.title em{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    color:var(--accent);
+    letter-spacing:-.015em;
+  }
+  .subtitle{
+    font-family:'Noto Serif SC',serif;
+    font-weight:400;
+    font-size:18px;
+    color:var(--ink-2);
+    max-width:720px;
+    line-height:1.65;
+    margin:0 0 28px 0;
+    border-left:3px solid var(--accent);
+    padding-left:18px;
+  }
+  .hero-meta{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:0;
+    border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+    padding:18px 0;
+  }
+  .hero-meta .cell{
+    padding:0 20px;
+    border-left:1px solid var(--rule);
+  }
+  .hero-meta .cell:first-child{border-left:none;padding-left:0}
+  .hero-meta .lbl{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.25em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:4px;
+  }
+  .hero-meta .val{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:20px;
+    color:var(--ink);
+  }
+  .hero-meta .val small{
+    font-family:'Noto Sans SC',sans-serif;
+    font-weight:400;
+    font-size:12px;
+    color:var(--ink-3);
+  }
+
+  /* ====== 章节 ====== */
+  section{
+    margin:72px 0 0 0;
+    scroll-margin-top:40px;
+  }
+  section > header.sec-head{
+    display:flex; align-items:baseline; gap:24px;
+    margin-bottom:28px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--ink);
+  }
+  section > header.sec-head .num{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:72px;
+    line-height:.85;
+    color:var(--accent);
+    letter-spacing:-.02em;
+  }
+  section > header.sec-head .num em{
+    font-style:normal;
+    color:var(--ink-3);
+    font-weight:400;
+  }
+  section > header.sec-head .tit{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:30px;
+    line-height:1.2;
+    color:var(--ink);
+    margin:0;
+  }
+  section > header.sec-head .tit small{
+    display:block;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:14px;
+    color:var(--ink-3);
+    letter-spacing:.05em;
+    margin-top:4px;
+  }
+
+  h3.sub{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--ink);
+    margin:32px 0 14px 0;
+    padding-left:16px;
+    position:relative;
+  }
+  h3.sub::before{
+    content:"";
+    position:absolute; left:0; top:6px;
+    width:5px; height:20px;
+    background:var(--accent);
+  }
+
+  p{margin:0 0 14px 0}
+  p.lead{
+    font-size:16px;
+    color:var(--ink-2);
+  }
+
+  /* ====== 列表 ====== */
+  ul.clean{
+    list-style:none; padding:0; margin:0 0 18px 0;
+  }
+  ul.clean li{
+    padding:8px 0 8px 24px;
+    position:relative;
+    border-bottom:1px dotted var(--rule);
+  }
+  ul.clean li:last-child{border-bottom:none}
+  ul.clean li::before{
+    content:"▸";
+    position:absolute; left:4px; top:8px;
+    color:var(--accent);
+    font-size:12px;
+  }
+
+  /* ====== 信息卡 ====== */
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+    gap:18px;
+    margin:16px 0;
+  }
+  .card{
+    background:#FFFFFF;
+    border:1px solid var(--rule);
+    padding:18px 20px;
+    position:relative;
+  }
+  .card .tag{
+    display:inline-block;
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:8px;
+    font-weight:700;
+  }
+  .card h4{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:16px;
+    margin:0 0 8px 0;
+    color:var(--ink);
+  }
+  .card p{font-size:14px;color:var(--ink-2);margin:0}
+
+  /* ====== 小问依赖图 ====== */
+  .qflow{
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    padding:22px;
+    margin:18px 0;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+    position:relative;
+  }
+  .qbox{
+    background:#FFFFFF;
+    border-left:4px solid var(--accent);
+    padding:14px 16px;
+    position:relative;
+  }
+  .qbox .qlbl{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:12px;
+    color:var(--accent);
+    font-weight:600;
+    letter-spacing:.06em;
+    margin-bottom:4px;
+  }
+  .qbox h5{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:14px;
+    margin:0 0 8px 0;
+  }
+  .qbox .io{
+    font-size:11.5px;
+    color:var(--ink-2);
+    line-height:1.55;
+  }
+  .qbox .io b{color:var(--ink);font-weight:600}
+  .qbox:not(:last-child)::after{
+    content:"→";
+    position:absolute;
+    right:-12px; top:50%;
+    transform:translateY(-50%);
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    color:var(--accent);
+    z-index:2;
+  }
+
+  /* ====== 表格 ====== */
+  table.tbl{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    margin:16px 0;
+    background:#FFFFFF;
+    border-top:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+  }
+  table.tbl th{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    color:var(--ink);
+    text-align:left;
+    padding:12px 14px;
+    border-bottom:1px solid var(--ink);
+    background:var(--paper-2);
+    font-size:12.5px;
+    letter-spacing:.05em;
+  }
+  table.tbl td{
+    padding:10px 14px;
+    border-bottom:1px solid var(--rule-2);
+    vertical-align:top;
+    color:var(--ink-2);
+  }
+  table.tbl tr:last-child td{border-bottom:none}
+  table.tbl td code, table.tbl td .sym{
+    font-family:'JetBrains Mono', 'Fraunces', serif;
+    font-style:italic;
+    color:var(--accent);
+    font-size:14px;
+    font-weight:600;
+  }
+
+  /* ====== 路径卡片 ====== */
+  .path{
+    border:1px solid var(--rule);
+    background:#FFFFFF;
+    margin:18px 0;
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:0;
+  }
+  .path .spine{
+    background:var(--ink-soft);
+    color:var(--paper);
+    padding:22px 18px;
+    position:relative;
+  }
+  .path .spine .ptag{
+    font-family:'Fraunces',serif;
+    font-size:11px;
+    letter-spacing:.25em;
+    text-transform:uppercase;
+    color:var(--ochre);
+    margin-bottom:10px;
+  }
+  .path .spine h4{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:18px;
+    margin:0 0 14px 0;
+    line-height:1.3;
+    color:#FFFFFF;
+  }
+  .path .spine .rec{
+    font-family:'Fraunces',serif;
+    font-size:11px;
+    letter-spacing:.1em;
+    color:var(--ochre);
+  }
+  .stars{letter-spacing:2px;color:var(--ochre)}
+  .stars .off{color:#4A586A}
+  .path .body{
+    padding:20px 24px;
+  }
+  .path .body p{font-size:13.5px;color:var(--ink-2);margin-bottom:10px}
+  .path .body p b{color:var(--ink);font-weight:600}
+  .path .meta{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:12px;
+    margin-top:10px;
+    padding-top:12px;
+    border-top:1px dotted var(--rule);
+  }
+  .path .meta .m{
+    font-size:12px;
+  }
+  .path .meta .m .lbl{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:2px;
+  }
+  .path .meta .m .v{
+    color:var(--ink);
+    font-weight:500;
+  }
+  .chip{
+    display:inline-block;
+    padding:2px 8px;
+    font-size:11px;
+    font-weight:600;
+    border-radius:2px;
+    margin-right:4px;
+  }
+  .chip.low{background:#E6EFE0;color:var(--olive)}
+  .chip.mid{background:#F4E8D4;color:var(--ochre)}
+  .chip.high{background:#F4DDD5;color:var(--accent)}
+
+  /* ====== 风险提示 ====== */
+  .risks{
+    display:grid;
+    gap:10px;
+  }
+  .risk-row{
+    display:grid;
+    grid-template-columns:48px 1fr;
+    gap:0;
+    border-left:3px solid var(--accent);
+    background:#FFFFFF;
+    border-top:1px solid var(--rule);
+    border-right:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+  }
+  .risk-row .rn{
+    background:var(--accent);
+    color:#FFF;
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .risk-row .rb{padding:12px 16px;font-size:13.5px}
+  .risk-row .rb b{font-family:'Noto Serif SC',serif;color:var(--ink);font-weight:700}
+
+  /* ====== checklist ====== */
+  .todo{
+    background:#FFFFFF;
+    border:1px solid var(--ink);
+    padding:10px 0;
+    margin:16px 0;
+  }
+  .todo .item{
+    display:grid;
+    grid-template-columns:40px 70px 90px 1fr 120px;
+    gap:0;
+    align-items:center;
+    padding:14px 20px;
+    border-bottom:1px dotted var(--rule);
+  }
+  .todo .item:last-child{border-bottom:none}
+  .todo .item .box{
+    width:18px; height:18px;
+    border:1.5px solid var(--ink);
+    display:inline-block;
+  }
+  .todo .item .rk{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:22px;
+    color:var(--accent);
+  }
+  .todo .item .pr{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .todo .pr.p1{color:var(--accent)}
+  .todo .pr.p2{color:var(--ochre)}
+  .todo .pr.p3{color:var(--ink-3)}
+  .todo .task{color:var(--ink);font-size:14px}
+  .todo .task b{font-family:'Noto Serif SC',serif;font-weight:700}
+  .todo .eta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-3);
+    text-align:right;
+  }
+
+  /* ====== 脚注/注释 ====== */
+  .note{
+    font-size:12.5px;
+    color:var(--ink-3);
+    font-style:italic;
+    margin-top:8px;
+    padding-left:12px;
+    border-left:2px solid var(--rule);
+    line-height:1.6;
+  }
+  .caveat{
+    display:inline-block;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:11px;
+    background:var(--paper-2);
+    color:var(--accent);
+    padding:1px 8px;
+    margin:0 3px;
+    border:1px solid var(--rule);
+  }
+
+  /* ====== 数据预览迷你图 ====== */
+  .dataset-bar{
+    display:grid;
+    grid-template-columns:repeat(10, 1fr);
+    gap:4px;
+    margin:10px 0;
+  }
+  .dataset-bar .u{
+    background:#FFFFFF;
+    border:1px solid var(--rule);
+    padding:10px 6px;
+    text-align:center;
+  }
+  .dataset-bar .u .id{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .dataset-bar .u .bar{
+    height:28px;
+    background:linear-gradient(180deg,var(--paper-2),var(--rule));
+    position:relative;
+    margin:6px 0 4px 0;
+  }
+  .dataset-bar .u .bar .fill{
+    position:absolute; left:0; bottom:0; width:100%;
+    background:var(--accent);
+  }
+  .dataset-bar .u .nm{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    color:var(--ink-3);
+  }
+
+  /* ====== 尾部 ====== */
+  footer.colophon{
+    margin-top:96px;
+    padding-top:28px;
+    border-top:2px solid var(--ink);
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:13px;
+    color:var(--ink-3);
+    display:flex; justify-content:space-between;
+    letter-spacing:.05em;
+  }
+  footer.colophon .sig{color:var(--accent);font-weight:600}
+
+  /* ====== 响应式 ====== */
+  @media (max-width: 960px){
+    .shell{grid-template-columns:1fr}
+    nav.toc{position:static; height:auto; border-right:none; border-bottom:1px solid var(--rule)}
+    main{padding:40px 28px 80px 28px}
+    .hero-meta{grid-template-columns:repeat(2,1fr)}
+    .hero-meta .cell{border-left:none;border-top:1px solid var(--rule);padding-top:12px}
+    .hero-meta .cell:first-child,.hero-meta .cell:nth-child(2){border-top:none}
+    .qflow{grid-template-columns:1fr;gap:10px}
+    .qbox:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-18px;transform:translateX(50%)}
+    .path{grid-template-columns:1fr}
+    .todo .item{grid-template-columns:30px 1fr;gap:8px 12px}
+    .todo .item .rk,.todo .item .pr,.todo .item .eta{grid-column:2}
+    .dataset-bar{grid-template-columns:repeat(5,1fr)}
+    section > header.sec-head{flex-direction:column;gap:4px}
+    section > header.sec-head .num{font-size:48px}
+  }
+  @media print{
+    nav.toc{display:none}
+    .shell{grid-template-columns:1fr}
+    main{padding:0}
+    body{background:#FFFFFF;background-image:none}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= 侧边导航 ======================= -->
+<nav class="toc">
+  <div class="brand">CUMCM · Battle Map</div>
+  <div class="brand-sub">A题 · 过滤设备监测</div>
+  <ol>
+    <li><a href="#s1">问题背景与核心诉求</a></li>
+    <li><a href="#s2">已知条件与数据梳理</a></li>
+    <li><a href="#s3">关键未知量与待求目标</a></li>
+    <li><a href="#s4">隐含假设与澄清点</a></li>
+    <li><a href="#s5">可选建模路径</a></li>
+    <li><a href="#s6">变量与符号体系</a></li>
+    <li><a href="#s7">预处理与检验建议</a></li>
+    <li><a href="#s8">风险提示</a></li>
+    <li><a href="#s9">24小时行动清单</a></li>
+  </ol>
+</nav>
+
+<!-- ======================= 主体 ======================= -->
+<main>
+
+<!-- 报头 -->
+<div class="masthead">
+  <span>2026 · 北京高校数学建模校际联赛</span>
+  <span class="issue">A题 · 过滤设备监测</span>
+  <span>建模作战地图 / v0</span>
+</div>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="kicker">Strategic Brief · 命题拆解</div>
+  <h1 class="title">过滤设备的<br><em>生命、成本与维护节律</em></h1>
+  <p class="subtitle">
+    10 台并联污水过滤器，2 年 11 万条小时级透水率记录，127 条维护事件。命题人表面问的是"寿命预测"与"最优维护"，内核只有一句——<b>在维护过勤的浪费和维护不足的早夭之间，找到全寿命期的年均成本最低点</b>。
+  </p>
+  <div class="hero-meta">
+    <div class="cell">
+      <div class="lbl">Filters</div>
+      <div class="val">10 <small>并联</small></div>
+    </div>
+    <div class="cell">
+      <div class="lbl">Obs / Filter</div>
+      <div class="val">≈ 11 k <small>小时级</small></div>
+    </div>
+    <div class="cell">
+      <div class="lbl">Time Span</div>
+      <div class="val">24·04 — 26·04 <small>2 yr</small></div>
+    </div>
+    <div class="cell">
+      <div class="lbl">Threshold</div>
+      <div class="val">P̄ &lt; 37 <small>年均报废</small></div>
+    </div>
+  </div>
+</header>
+
+<!-- ======================= §1 问题背景 ======================= -->
+<section id="s1">
+  <header class="sec-head">
+    <span class="num"><em>§</em>1</span>
+    <h2 class="tit">问题背景与核心诉求<small>Problem Context &amp; What the Jury Really Wants</small></h2>
+  </header>
+
+  <p class="lead">
+    工厂并联部署多台污水过滤器，<b>透水率</b>（permeability rate）既反映过滤器的即时性能、也反映其健康状态。附着污垢和自然老化会让透水率持续下行，小/中/大三级维护可周期性拉升透水率，但每次维护同时对过滤器结构造成不可逆损伤，且维护效果又受季节调制。当年均透水率跌破 37 且维护无法回补时，设备寿命终止（购新机 300 万元）。
+  </p>
+
+  <h3 class="sub">命题人真正关心的三件事</h3>
+  <ul class="clean">
+    <li><b>描述</b>：透水率时序的结构性特征——日周期？年周期？维护脉冲的幅值和衰减？自然老化率是多少？</li>
+    <li><b>预测</b>：在现行维护策略延续的前提下，每台设备还能活多久——这是后续成本摊销的分母。</li>
+    <li><b>决策</b>：给定季节与维护副作用的耦合，怎样的维护节律能把 <span class="caveat">(购置成本 + 维护成本) / 寿命年数</span> 这一年均总成本压到最低，并对成本扰动稳健。</li>
+  </ul>
+
+  <h3 class="sub">题目所属的典型问题类别</h3>
+  <div class="cards">
+    <div class="card">
+      <span class="tag">Q1</span>
+      <h4>时序分析 + 特征工程</h4>
+      <p>周期性分解、趋势提取、事件响应估计——本质是描述性统计任务。</p>
+    </div>
+    <div class="card">
+      <span class="tag">Q2</span>
+      <h4>机理建模 / 寿命预测</h4>
+      <p>带事件的时序外推，可走 ODE+脉冲、Prophet/SARIMA，或 Weibull 生存分析。</p>
+    </div>
+    <div class="card">
+      <span class="tag">Q3</span>
+      <h4>带状态约束的整数规划</h4>
+      <p>决策变量是离散维护事件的时间点和类型，目标是年均成本，约束是透水率阈值。</p>
+    </div>
+    <div class="card">
+      <span class="tag">Q4</span>
+      <h4>灵敏度 / 稳健性分析</h4>
+      <p>成本参数扰动下的方案稳定性，典型的 post-optimality analysis。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= §2 已知条件 ======================= -->
+<section id="s2">
+  <header class="sec-head">
+    <span class="num"><em>§</em>2</span>
+    <h2 class="tit">已知条件与数据梳理<small>What We Know, What's in the Files</small></h2>
+  </header>
+
+  <h3 class="sub">显式给定的成本、阈值、频率参数</h3>
+  <table class="tbl">
+    <thead>
+      <tr><th style="width:26%">项目</th><th style="width:22%">数值</th><th>性质 / 备注</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>过滤器购置价</td><td><code>300 万元 / 台</code></td><td>硬性成本，寿命终止后必须支付</td></tr>
+      <tr><td>大维护成本</td><td><code>12 万元 / 次</code></td><td>每年 1 – 4 次（数据中 A4/A8 为 0，见风险提示）</td></tr>
+      <tr><td>中维护成本</td><td><code>3 万元 / 次</code></td><td>下降较快或间隔过久时启用</td></tr>
+      <tr><td>小维护成本</td><td><code>忽略不计</code></td><td>日常维护，3–5 天 1 次；附件未给记录</td></tr>
+      <tr><td>报废阈值</td><td><code>P̄ &lt; 37</code></td><td>硬约束；是"年平均透水率"，而非瞬时值</td></tr>
+      <tr><td>投用时间</td><td><code>2022 年 4 月</code></td><td>10 台同期投入，数据起点已运行 2 年</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub">附件 1：透水率时序（10 个工作表 A_1 … A_10）</h3>
+  <p>字段仅 2 列：<code>time</code>（datetime，小时级采样）+ <code>per</code>（透水率指数）。下图条形的高度＝该台有效样本占比，数值为均值/缺失率。</p>
+
+  <div class="dataset-bar">
+    <div class="u"><div class="id">A_1</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=91.5 · 4.2%⌀</div></div>
+    <div class="u"><div class="id">A_2</div><div class="bar"><div class="fill" style="height:97%"></div></div><div class="nm">μ=73.7 · 3.6%⌀</div></div>
+    <div class="u"><div class="id">A_3</div><div class="bar"><div class="fill" style="height:97%"></div></div><div class="nm">μ=93.6 · 3.4%⌀</div></div>
+    <div class="u"><div class="id">A_4</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=92.0 · 3.8%⌀</div></div>
+    <div class="u"><div class="id">A_5</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=93.1 · 3.8%⌀</div></div>
+    <div class="u"><div class="id">A_6</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=74.0 · 3.9%⌀</div></div>
+    <div class="u"><div class="id">A_7</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=89.9 · 3.8%⌀</div></div>
+    <div class="u"><div class="id">A_8</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=95.5 · 3.6%⌀</div></div>
+    <div class="u"><div class="id">A_9</div><div class="bar"><div class="fill" style="height:96%"></div></div><div class="nm">μ=82.3 · 4.1%⌀</div></div>
+    <div class="u"><div class="id">A_10</div><div class="bar"><div class="fill" style="height:97%"></div></div><div class="nm">μ=94.9 · 3.5%⌀</div></div>
+  </div>
+
+  <p class="note">
+    规模：10 机 × 约 1.07 万 – 1.22 万条，合计约 <b>11.5 万</b> 条小时级观测。时间跨度 <b>2024-04-03 ~ 2026-04-10</b>（A_7 – A_10 起始点晚 1 天）。透水率极差从 <code>26.4</code> 到 <code>180.0</code>，<b>出现大量 &gt;100 的读数</b>——显然并非字面百分比，应视为无量纲指数，论文中须明确定义。
+  </p>
+
+  <h3 class="sub">附件 2：维护记录（Sheet1，127 条）</h3>
+  <table class="tbl">
+    <thead><tr><th>字段</th><th>说明</th><th>分布</th></tr></thead>
+    <tbody>
+      <tr><td><code>编号</code></td><td>过滤器 ID，A1 – A10，与附件 1 的 A_1 – A_10 一一对应</td><td>10 个</td></tr>
+      <tr><td><code>日期</code></td><td>维护日期（仅到日，无小时）</td><td>2024-05-18 ~ 2026-04-05</td></tr>
+      <tr><td><code>维护类型</code></td><td>仅两类：中维护 / 大维护。<b>小维护未记录</b>。</td><td>中维护 110 · 大维护 17</td></tr>
+    </tbody>
+  </table>
+  <p class="note">
+    每台中维护 <b>9 – 13</b> 次 / 2 年，大维护 <b>0 – 3</b> 次 / 2 年。A4、A8 两年内大维护为 <b>0 次</b>，与题干"每年 1 至 4 次不等"的说法存在张力——需在假设里处理。
+  </p>
+
+  <h3 class="sub">数据质量已识别的问题</h3>
+  <ul class="clean">
+    <li><b>缺失值</b>：每台 3.4% – 4.2%，多为整块连续缺失（推测停机/传感器故障），须区分"正常停机窗口" vs "意外缺测"。</li>
+    <li><b>采样不等距</b>：以 1 小时为主，存在 2/3/4/5/6/11/12 小时的跳空。时间轴须重采样对齐。</li>
+    <li><b>量级差异</b>：A_2 / A_6 的均值只有 73 – 74，明显低于其他 90+ 的机组，且最小值已降至 26 – 28——可能是个体状态偏差，也可能是单位/校准问题。</li>
+    <li><b>大值异常</b>：A_10 最大值 180，A_5/A_6/A_8 超过 150，是否为瞬时噪声或传感器飘移须核查。</li>
+    <li><b>维护记录只到"日"</b>：附件 1 是小时级，附件 2 是日级，跨粒度对齐时须统一口径（推荐以"维护当日 00:00"作为事件时刻）。</li>
+    <li><b>2026-04 数据截断</b>：最后一个月样本稀疏（A_1 仅 40 条），年均统计时要做样本权重调整。</li>
+  </ul>
+
+  <h3 class="sub">硬约束 vs 软假设</h3>
+  <div class="cards">
+    <div class="card">
+      <span class="tag">HARD</span>
+      <h4>硬约束（不可松动）</h4>
+      <p>① 年均透水率 &lt; 37 且维护失效 → 报废；<br>② 三种维护成本数值；<br>③ 购置价 300 万；<br>④ 小时级采样粒度。</p>
+    </div>
+    <div class="card">
+      <span class="tag">SOFT</span>
+      <h4>软假设（可调整）</h4>
+      <p>① 大维护 1–4 次/年（数据反例存在）；<br>② 小维护 3–5 天 1 次且固定；<br>③ 小维护成本完全忽略；<br>④ 维护生效为"瞬时"跳变。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= §3 关键未知量 ======================= -->
+<section id="s3">
+  <header class="sec-head">
+    <span class="num"><em>§</em>3</span>
+    <h2 class="tit">关键未知量与待求目标<small>Unknowns, Inputs &amp; Outputs by Sub-Question</small></h2>
+  </header>
+
+  <p class="lead">下图自左至右是四小问的输入-输出关系：Q1 的指标喂给 Q2 的预测模型，Q2 的寿命分布又是 Q3 优化的目标函数分母，Q3 的最优方案进入 Q4 做扰动分析。</p>
+
+  <div class="qflow">
+    <div class="qbox">
+      <div class="qlbl">Q1 · 描述</div>
+      <h5>透水率变化的影响指标</h5>
+      <div class="io"><b>入：</b>附件1+2 原始数据<br><b>出：</b>① 周期分量(日/年)；② 年下降率 α；③ 维护增益 Δ<sub>M</sub>、Δ<sub>L</sub>；④ "净性能"综合指标</div>
+    </div>
+    <div class="qbox">
+      <div class="qlbl">Q2 · 预测</div>
+      <h5>10 台过滤器的寿命</h5>
+      <div class="io"><b>入：</b>Q1 的指标 + 维护规律<br><b>出：</b>每台设备报废日期（含区间估计）；本题默认延续"当前固定维护规律"</div>
+    </div>
+    <div class="qbox">
+      <div class="qlbl">Q3 · 优化</div>
+      <h5>最优维护方案</h5>
+      <div class="io"><b>入：</b>Q1 的机理 + Q2 的寿命-维护函数关系<br><b>出：</b>年/季度 维护时间表（含类型）；对应的最小 <span class="sym">C̄</span></div>
+    </div>
+    <div class="qbox">
+      <div class="qlbl">Q4 · 鲁棒</div>
+      <h5>方案的成本敏感性</h5>
+      <div class="io"><b>入：</b>Q3 的最优解<br><b>出：</b>价格/维护成本扰动下的方案切换点；<b>仍然可行</b>的扰动区间</div>
+    </div>
+  </div>
+
+  <h3 class="sub">小问精度/形式要求逐条拆解</h3>
+  <table class="tbl">
+    <thead><tr><th style="width:8%">问</th><th style="width:32%">输入</th><th style="width:32%">输出（形式）</th><th>精度 / 交付物建议</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Q1</b></td>
+        <td>两张附件的原始数据（清洗后）</td>
+        <td>定性结论 + 定量指标（周期强度、趋势斜率、维护跃升均值 &amp; 置信区间）</td>
+        <td>至少 3 张图：原始时序、STL 分解、维护前后对比；另加一个"综合指标"的数学定义</td>
+      </tr>
+      <tr>
+        <td><b>Q2</b></td>
+        <td>Q1 的参数估计结果</td>
+        <td>10 个数字：剩余寿命（月/年），或报废日期；最好给 95% 预测区间</td>
+        <td>按"当前固定维护规律"延续。交付：寿命表 + 轨迹外推图 + 模型 RMSE</td>
+      </tr>
+      <tr>
+        <td><b>Q3</b></td>
+        <td>Q1 机理模型 + Q2 寿命函数</td>
+        <td>每台的最优维护时刻表 + 全寿命成本 + 对应的 <span class="sym">C̄</span></td>
+        <td>必须给出与"当前策略"的对比百分比节省；方法可重现（求解器或启发式种子）</td>
+      </tr>
+      <tr>
+        <td><b>Q4</b></td>
+        <td>Q3 最优方案 + 成本参数分布</td>
+        <td>敏感度曲线（纵轴 <span class="sym">C̄</span>，横轴扰动比例）+ 方案稳定域</td>
+        <td>回答"在多大范围内最优结构不变"；至少覆盖 ±30%</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======================= §4 隐含假设 ======================= -->
+<section id="s4">
+  <header class="sec-head">
+    <span class="num"><em>§</em>4</span>
+    <h2 class="tit">隐含假设与需要澄清的点<small>Hidden Assumptions &amp; Ambiguities</small></h2>
+  </header>
+
+  <h3 class="sub">建模不得不引入的假设</h3>
+  <ul class="clean">
+    <li><b>小维护等距</b>：取固定 4 天为小维护间隔，不计入决策变量（因成本≈0 且影响常态化）。可与 3、5 天做敏感性对比。</li>
+    <li><b>维护即时生效</b>：把维护视作透水率的瞬时脉冲跃升（<span class="sym">δ</span> 函数），把"维护当日"作为事件时刻。</li>
+    <li><b>年均的窗口</b>：按"滚动 12 个月"而不是日历年计算 <span class="sym">P̄</span>——更贴近"寿命终止判定"的工程含义。<span class="caveat">需查证</span></li>
+    <li><b>季节因子可分离</b>：假设透水率 = 趋势 × 季节 × 事件脉冲 × 噪声，乘性或加性分解二选一。</li>
+    <li><b>维护损伤可累计</b>：每次维护让"可达峰值"下降一个常数 <span class="sym">δ<sub>L</sub></span>，累计为线性。</li>
+    <li><b>设备异质性</b>：10 台共享结构、参数各异（随机效应）——面板模型下每台估计自身的 <span class="sym">α<sub>i</sub></span>、<span class="sym">Δ<sub>i</sub></span>。</li>
+  </ul>
+
+  <h3 class="sub">现实成立、数学需简化之处</h3>
+  <ul class="clean">
+    <li>真实污水浓度波动、入口流量、温度都会影响透水率——统统打包进"季节因子 + 残差"。</li>
+    <li>维护工人的操作差异、备件新旧差异——用"维护类型固定增益"吸收。</li>
+    <li>过滤膜的非线性老化（早期快、中期缓、末期陡）——线性近似是起步，必要时改为 Weibull 形。</li>
+  </ul>
+
+  <h3 class="sub">容易踩坑的歧义表述</h3>
+  <ul class="clean">
+    <li>"<b>年平均透水率低于一定数值（通常是37）</b>"——"通常"暗示 37 是常见阈值但并非绝对，可在 Q4 做阈值敏感性（35 / 37 / 40）。</li>
+    <li>"<b>维护后也无法有效改善</b>"——什么叫"无法改善"？需要给出操作化定义（例如：一次大维护后 <span class="sym">P̄</span> 仍 &lt; 37 持续 3 个月）。</li>
+    <li>"<b>透水率</b>"的单位——附件中出现 &gt;100 甚至 180 的值，需在论文<b>符号说明</b>里明确其为"归一化指数 / 标定后读数"。</li>
+    <li>"<b>最优维护方案</b>"——是逐机独立最优，还是 10 台联合最优（并联冗余下的协同）？默认前者，建议论文里说明并讨论后者作为延伸。</li>
+  </ul>
+</section>
+
+<!-- ======================= §5 建模路径 ======================= -->
+<section id="s5">
+  <header class="sec-head">
+    <span class="num"><em>§</em>5</span>
+    <h2 class="tit">可选建模路径<small>Candidate Modelling Pipelines</small></h2>
+  </header>
+
+  <p class="lead">给出四条候选路径，<b>C 路径（混合分解 + MILP）</b>是最建议的主干，兼顾可解释性和求解可行性，是国赛获奖论文的典型套路。其余三条可作对照/鲁棒性验证材料，让论文更有分量。</p>
+
+  <!-- Path A -->
+  <div class="path">
+    <div class="spine">
+      <div class="ptag">Path A</div>
+      <h4>状态 · 脉冲<br>响应方程 + DP</h4>
+      <div class="rec">推荐 <span class="stars">★★★★<span class="off">★</span></span></div>
+    </div>
+    <div class="body">
+      <p><b>核心思路：</b>把透水率建成一阶 ODE  <span class="sym">dP/dt = −α(t)·P + f<sub>season</sub>(t) + Σ Δ<sub>k</sub>·δ(t−t<sub>k</sub>)</span>，维护为脉冲输入；用动态规划在时间离散化后搜索最优脉冲序列。</p>
+      <p><b>工具：</b>非线性回归 / scipy.integrate.odeint / 离散 DP（状态 = 当前净性能）。</p>
+      <p><b>优点：</b>物理意义明确，评委易买账；参数少，便于做敏感性。<br><b>缺点：</b>季节函数形式的选择会决定成败；非线性项若必要，DP 状态空间会爆炸。</p>
+      <div class="meta">
+        <div class="m"><div class="lbl">难度</div><div class="v"><span class="chip mid">中</span></div></div>
+        <div class="m"><div class="lbl">数据需求</div><div class="v">中</div></div>
+        <div class="m"><div class="lbl">论文卖点</div><div class="v">机理性 · 可解释</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Path B -->
+  <div class="path">
+    <div class="spine">
+      <div class="ptag">Path B</div>
+      <h4>Prophet / SARIMA<br>+ GA 优化</h4>
+      <div class="rec">推荐 <span class="stars">★★★<span class="off">★★</span></span></div>
+    </div>
+    <div class="body">
+      <p><b>核心思路：</b>用 Prophet / SARIMAX 自动抽取趋势 + 年周期 + 节假日（冒充维护事件），在其外推上用遗传算法 / PSO 搜索最优维护时间点。</p>
+      <p><b>工具：</b>Prophet、statsmodels SARIMAX、DEAP / pyomo、scikit-optimize。</p>
+      <p><b>优点：</b>上手快，自动处理季节性；<br><b>缺点：</b>黑盒特征强，难解释维护脉冲的物理含义；GA 收敛性不稳定；评委可能追问"为什么是这些参数"。</p>
+      <div class="meta">
+        <div class="m"><div class="lbl">难度</div><div class="v"><span class="chip low">低-中</span></div></div>
+        <div class="m"><div class="lbl">数据需求</div><div class="v">低</div></div>
+        <div class="m"><div class="lbl">论文卖点</div><div class="v">快速 baseline</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Path C -->
+  <div class="path">
+    <div class="spine">
+      <div class="ptag">Path C · 主推</div>
+      <h4>STL 分解 + 事件<br>回归 + MILP</h4>
+      <div class="rec">推荐 <span class="stars">★★★★★</span></div>
+    </div>
+    <div class="body">
+      <p><b>核心思路：</b>用 STL（Seasonal-Trend decomposition by Loess）把 <span class="sym">P(t)</span> 拆成 <span class="sym">T(t)+S(t)+R(t)</span>；对残差序列建立"维护事件回归"（包含 M/L 两个指示变量，滞后项捕捉衰减），估计 <span class="sym">Δ<sub>M</sub></span>、<span class="sym">Δ<sub>L</sub></span> 及其季节交互项；以趋势外推至 37 为寿命约束，用 MILP 求每台每月维护类型的 0-1 变量。</p>
+      <p><b>工具：</b>statsmodels STL · 面板固定效应回归 · PuLP / Gurobi / CBC · Python 数据栈。</p>
+      <p><b>优点：</b>每一步都有明确的经济学/工程学解释；MILP 可直接给"全局最优"背书；国赛论文最吃这套"清晰链路"。<br><b>缺点：</b>步骤多，需要工期预算；MILP 规模若失控需借助拉格朗日松弛或滚动时域求解。</p>
+      <div class="meta">
+        <div class="m"><div class="lbl">难度</div><div class="v"><span class="chip mid">中</span></div></div>
+        <div class="m"><div class="lbl">数据需求</div><div class="v">中</div></div>
+        <div class="m"><div class="lbl">论文卖点</div><div class="v">可解释 · 全局最优</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Path D -->
+  <div class="path">
+    <div class="spine">
+      <div class="ptag">Path D</div>
+      <h4>Weibull 生存 + <br>蒙特卡洛成本</h4>
+      <div class="rec">推荐 <span class="stars">★★★<span class="off">★★</span></span></div>
+    </div>
+    <div class="body">
+      <p><b>核心思路：</b>把"透水率首次跌破 37 的时刻"当作失效事件，用 Weibull / Cox 比例风险模型建生存函数；把维护次数作为时变协变量。Q3 用蒙特卡洛在生存分布下搜索维护方案。</p>
+      <p><b>工具：</b>lifelines、pymc（贝叶斯 Weibull）、numpy 蒙卡。</p>
+      <p><b>优点：</b>寿命估计天然带置信区间，Q4 的不确定性好讲；<br><b>缺点：</b>样本仅 10 台，生存分析容易过拟合；当前数据中尚无设备真正报废（<span class="sym">P̄</span>&lt;37），右删失严重，参数识别困难。</p>
+      <div class="meta">
+        <div class="m"><div class="lbl">难度</div><div class="v"><span class="chip high">中-高</span></div></div>
+        <div class="m"><div class="lbl">数据需求</div><div class="v">高（样本小）</div></div>
+        <div class="m"><div class="lbl">论文卖点</div><div class="v">不确定性量化</div></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>推荐组合：</b>主干走 C，用 A 做机理对照（论文第 6 节"模型对比"），用 D 的 Weibull 在 Q2 里给寿命的预测区间，用 B 做"现有方法基线"表格的对照项。四条路径相互作证 → 论文厚度与可信度皆上升。
+  </p>
+</section>
+
+<!-- ======================= §6 符号体系 ======================= -->
+<section id="s6">
+  <header class="sec-head">
+    <span class="num"><em>§</em>6</span>
+    <h2 class="tit">变量与符号体系建议<small>Notation Table · 可直接抄入论文"符号说明"章节</small></h2>
+  </header>
+
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th style="width:18%">符号</th>
+        <th style="width:36%">含义</th>
+        <th style="width:14%">单位</th>
+        <th>取值范围 / 备注</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="sym">P<sub>i</sub>(t)</span></td><td>第 <span class="sym">i</span> 台过滤器在时刻 <span class="sym">t</span> 的瞬时透水率</td><td>无量纲指数</td><td>观测数据上 [26, 180]</td></tr>
+      <tr><td><span class="sym">P̄<sub>i</sub>(y)</span></td><td>第 <span class="sym">i</span> 台第 <span class="sym">y</span> 年（滚动 12 月）的年均透水率</td><td>无量纲</td><td>&gt; 0；报废判据 <span class="sym">P̄ &lt; 37</span></td></tr>
+      <tr><td><span class="sym">T<sub>i</sub>(t), S(t), R<sub>i</sub>(t)</span></td><td>STL 分解出的趋势项、季节项（全机共享）、残差项</td><td>无量纲</td><td>S(t) 以 365 日为周期</td></tr>
+      <tr><td><span class="sym">α<sub>i</sub></span></td><td>第 <span class="sym">i</span> 台的自然老化速率（趋势项斜率）</td><td>1 / 日</td><td>&lt; 0 （单调下降）</td></tr>
+      <tr><td><span class="sym">Δ<sub>M</sub>, Δ<sub>L</sub></span></td><td>中 / 大维护的即时透水率增益</td><td>无量纲</td><td>由回归估计，Δ<sub>L</sub> &gt; Δ<sub>M</sub> &gt; 0</td></tr>
+      <tr><td><span class="sym">δ<sub>M</sub>, δ<sub>L</sub></span></td><td>中 / 大维护带来的<b>永久性</b>性能损伤（使基线下行）</td><td>无量纲</td><td>&ge; 0</td></tr>
+      <tr><td><span class="sym">γ(m)</span></td><td>季节调制因子（按月份 m）</td><td>倍数</td><td>通常 γ ∈ [0.85, 1.15]</td></tr>
+      <tr><td><span class="sym">τ<sub>i</sub></span></td><td>第 <span class="sym">i</span> 台过滤器寿命（从 2022-04 起算）</td><td>日</td><td>&gt; 0，Q2 输出</td></tr>
+      <tr><td><span class="sym">C<sub>buy</sub></span></td><td>设备购置成本</td><td>万元</td><td>= 300</td></tr>
+      <tr><td><span class="sym">C<sub>M</sub>, C<sub>L</sub></span></td><td>中 / 大维护单次成本</td><td>万元</td><td>= 3, 12</td></tr>
+      <tr><td><span class="sym">n<sub>M,i</sub>, n<sub>L,i</sub></span></td><td>第 <span class="sym">i</span> 台在一个寿命周期内的中/大维护次数</td><td>次</td><td>非负整数</td></tr>
+      <tr><td><span class="sym">x<sub>i,t,k</sub></span></td><td>0-1 决策变量：第 i 台在周 t 是否执行 k∈{M,L} 型维护</td><td>—</td><td>{0, 1}</td></tr>
+      <tr><td><span class="sym">C̄<sub>i</sub></span></td><td>第 <span class="sym">i</span> 台的年均总成本（目标函数）</td><td>万元 / 年</td><td>待最小化</td></tr>
+      <tr><td><span class="sym">C̄</span></td><td>全工厂 10 台的年均总成本</td><td>万元 / 年</td><td>= Σ <span class="sym">C̄<sub>i</sub></span></td></tr>
+    </tbody>
+  </table>
+  <p class="note">符号设计遵循：① 拉丁字母大写用于状态量和成本，小写用于决策和计数；② 希腊字母用于机理参数；③ 下标 <span class="sym">i</span> 永远表示设备编号，<span class="sym">t</span> 表示时间，<span class="sym">k</span> 表示维护类型。避免跨章节复用同一字母，便于评委核对。</p>
+</section>
+
+<!-- ======================= §7 预处理 ======================= -->
+<section id="s7">
+  <header class="sec-head">
+    <span class="num"><em>§</em>7</span>
+    <h2 class="tit">数据预处理与检验建议<small>Pipeline · From Raw to Modelable</small></h2>
+  </header>
+
+  <h3 class="sub">预处理 6 步走</h3>
+  <ol style="padding-left:22px;color:var(--ink-2)">
+    <li><b>时间轴重采样</b>：把 10 张表统一为每小时整点、共同时间轴，缺失格保留 NaN 而非强行插值。</li>
+    <li><b>缺失诊断</b>：连续缺失 &gt; 6 小时 的窗口标记为"停机段"；&le; 3 小时短缺口做时间加权线性插值。</li>
+    <li><b>异常剔除</b>：用滚动 72 小时中位数 ± 3·MAD 识别尖刺；<b>保留</b>维护事件前后 ±24 小时内的跳变不当异常。</li>
+    <li><b>维护事件对齐</b>：附件 2 日期转为时间戳（当日 00:00），在附件 1 中定位前/后窗口（例如前 3 天 vs 后 3 天）计算增益。</li>
+    <li><b>聚合尺度分叉</b>：① 小时级用于维护脉冲响应估计；② 日均用于趋势/季节分解；③ 滚动 12 月均值用于 <span class="sym">P̄</span> 的报废判定。</li>
+    <li><b>面板结构化</b>：最终得到一张 long-format 表（filter_id, time, per, season, maint_type, days_since_last_M, days_since_last_L, ...），作为所有后续建模的唯一数据源。</li>
+  </ol>
+
+  <h3 class="sub">模型检验清单</h3>
+  <table class="tbl">
+    <thead><tr><th style="width:22%">检验项</th><th>方法</th><th style="width:22%">合格阈值</th></tr></thead>
+    <tbody>
+      <tr><td>残差白噪声</td><td>Ljung-Box 检验；残差 ACF 图</td><td>Q(20) 的 p 值 &gt; 0.1</td></tr>
+      <tr><td>残差正态性</td><td>Shapiro-Wilk / QQ 图</td><td>QQ 图大体直线即可</td></tr>
+      <tr><td>维护增益显著性</td><td>配对 t 检验（前/后窗口均值）+ 稳健标准误</td><td>p &lt; 0.01</td></tr>
+      <tr><td>寿命预测精度</td><td>留一法（9 台训练，1 台验证）；MAE / MAPE</td><td>MAPE &lt; 15%（内部目标）</td></tr>
+      <tr><td>优化方案稳健性</td><td>成本参数 ±20% 扰动下 MILP 解结构是否变</td><td>维护次数变化 &le; 10%</td></tr>
+      <tr><td>阈值敏感性</td><td>把 37 换成 35、40 再跑一次 Q2/Q3</td><td>寿命排序保持；年均成本变化单调</td></tr>
+    </tbody>
+  </table>
+  <p class="note">论文里把"灵敏度分析 + 稳健性检验"单列一节（通常是第 7 节或第 8 节），评委看到这一节就会放心——这是国赛论文的"必得分点"。</p>
+</section>
+
+<!-- ======================= §8 风险提示 ======================= -->
+<section id="s8">
+  <header class="sec-head">
+    <span class="num"><em>§</em>8</span>
+    <h2 class="tit">风险提示<small>Where Past Teams Have Lost Points</small></h2>
+  </header>
+
+  <div class="risks">
+    <div class="risk-row"><div class="rn">1</div><div class="rb"><b>"透水率 &gt; 100" 的物理含义。</b> 附件里出现 150–180 的读数，若论文不说明"透水率是归一化指数非百分比"，评委会怀疑数据理解失误。<b>对策：</b>摘要第一段就对 <span class="sym">P</span> 的量纲做一句澄清，并在§3"符号说明"里定义。</div></div>
+    <div class="risk-row"><div class="rn">2</div><div class="rb"><b>"年平均 &lt; 37" 的窗口定义。</b> 滚动 12 月 vs 日历年，会导致某些机组寿命结论差半年以上。<b>对策：</b>明确选择一种并说明理由；Q4 里顺便做另一种的对比。</div></div>
+    <div class="risk-row"><div class="rn">3</div><div class="rb"><b>A4 / A8 的 0 次大维护。</b> 数据事实与题干"每年 1–4 次"冲突。<b>对策：</b>在假设章节指出这是"某些机组的实际操作"，并在 Q3 里讨论"把下限放宽到 0"是否真的最优。</div></div>
+    <div class="risk-row"><div class="rn">4</div><div class="rb"><b>小维护未入账的偏差。</b> 若小维护真是每 3–5 天一次且有透水率贡献，完全忽略会让 Δ<sub>M</sub>、Δ<sub>L</sub> 被系统性低估。<b>对策：</b>在假设里把小维护视作"基线的一部分"，并在灵敏性分析中尝试给它一个小 Δ<sub>S</sub>。</div></div>
+    <div class="risk-row"><div class="rn">5</div><div class="rb"><b>2026-04 数据截断。</b> 这一段样本少、均值容易偏，但正是寿命预测的"起跑线"。<b>对策：</b>滚动 12 月窗口避开纯 2026-04 的单点判定；或用"截至 2026-04 已观测到的滚动 P̄"作为预测起点。</div></div>
+    <div class="risk-row"><div class="rn">6</div><div class="rb"><b>"最优"的证明。</b> 很多队只给出方案不证明最优。<b>对策：</b>用 MILP 的 gap &lt; 0.1% 作最优性证明；若用启发式，则至少跑 30 次随机种子给分布。</div></div>
+    <div class="risk-row"><div class="rn">7</div><div class="rb"><b>维护损伤的可识别性。</b> "维护让透水率瞬升、但让基线下降"——若模型不加约束，<span class="sym">δ</span> 很容易与自然老化 <span class="sym">α</span> 共线性。<b>对策：</b>把 <span class="sym">δ</span> 限定为跟维护类型挂钩的离散系数，而非时间函数。</div></div>
+    <div class="risk-row"><div class="rn">8</div><div class="rb"><b>"季节对维护效果的影响"被忽略。</b> 题干明确提到"维护效果受季节影响"，但很多队只做季节对 P 的影响。<b>对策：</b>在维护事件回归中加入 <span class="sym">Δ<sub>k</sub> × S(t)</span> 交互项，论文里单独绘图展示。</div></div>
+    <div class="risk-row"><div class="rn">9</div><div class="rb"><b>摘要写成流水账。</b> 摘要不能超过一页，却是评委最先读、评分权重最高的部分。<b>对策：</b>摘要按"背景 → 方法关键词 → 主要结果（带数字） → 创新点"四块式结构，每块一段。</div></div>
+  </div>
+</section>
+
+<!-- ======================= §9 行动清单 ======================= -->
+<section id="s9">
+  <header class="sec-head">
+    <span class="num"><em>§</em>9</span>
+    <h2 class="tit">24 小时行动清单<small>Checklist · Highest-Leverage First</small></h2>
+  </header>
+
+  <p class="lead">严格按优先级推进：前 3 项不完成，后面所有建模都没有干净的数据基础。预估总工时 <b>14 – 18 小时</b>，适合 3 人小组并行。</p>
+
+  <div class="todo">
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">1</span>
+      <span class="pr p1">P1 · 核心</span>
+      <span class="task"><b>数据清洗与面板化。</b> 合并 10 张 sheet，统一时间轴，缺失值分类处理，输出 <code>panel.parquet</code>。</span>
+      <span class="eta">2.5 h · 数据手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">2</span>
+      <span class="pr p1">P1 · 核心</span>
+      <span class="task"><b>10 张探索图。</b> 每台过滤器的原始时序 + 维护事件垂直线 + 滚动 30 日均值，第一时间看出结构。</span>
+      <span class="eta">1.5 h · 数据手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">3</span>
+      <span class="pr p1">P1 · 核心</span>
+      <span class="task"><b>维护增益量化。</b> 用前 3 天 vs 后 3 天均值差估计 Δ<sub>M</sub>、Δ<sub>L</sub>，并做按季节分组的配对 t 检验。</span>
+      <span class="eta">2 h · 建模手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">4</span>
+      <span class="pr p2">P2 · 重要</span>
+      <span class="task"><b>STL 分解 + 趋势拟合。</b> 对日均序列做 STL，输出每台的 α<sub>i</sub> 估计；画 10 张分解子图。</span>
+      <span class="eta">2.5 h · 建模手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">5</span>
+      <span class="pr p2">P2 · 重要</span>
+      <span class="task"><b>Q2 baseline 跑通。</b> "线性趋势 + 正弦季节 + 维护脉冲"模型向前外推，输出 10 台寿命估计。先求跑通，不求精度。</span>
+      <span class="eta">3 h · 建模手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">6</span>
+      <span class="pr p2">P2 · 重要</span>
+      <span class="task"><b>论文骨架搭建。</b> 按格式规范建好 LaTeX/Word 模板：摘要、符号说明、假设、模型、结果、灵敏度、参考文献、附录；正文从第 2 页开始编页码，无页眉。</span>
+      <span class="eta">1 h · 写作手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">7</span>
+      <span class="pr p3">P3 · 加分</span>
+      <span class="task"><b>文献调研。</b> 过滤器/膜污染寿命建模 2 篇 + Weibull 生存分析 1 篇 + 维护策略优化 1 篇，摘录参考文献条目。</span>
+      <span class="eta">1.5 h · 写作手</span>
+    </div>
+    <div class="item">
+      <span class="box"></span>
+      <span class="rk">8</span>
+      <span class="pr p3">P3 · 加分</span>
+      <span class="task"><b>第二天分工确认。</b> Q3 MILP 由谁建？Q4 敏感性扫描由谁跑？每日 21:00 同步进度，规避返工。</span>
+      <span class="eta">0.5 h · 全员</span>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>节奏建议：</b>第 1 日：完成 1-5 项，产出"数据基础 + Q1 初稿 + Q2 baseline"。第 2 日上午：升级 Q2 模型精度，开始 Q3 MILP。第 2 日下午 + 第 3 日：Q3 求解、Q4 敏感性、全文整合。<b>留足最后 6 小时做论文格式校对和 PDF 输出</b>——这是最容易被忽视、又最容易被扣分的地方（格式规范第 8 条：不符合格式视为违反竞赛规则）。
+  </p>
+</section>
+
+<!-- ======================= 尾部 ======================= -->
+<footer class="colophon">
+  <span>Prepared for CUMCM 2026 · A题 / 过滤设备监测</span>
+  <span class="sig">— End of Battle Map —</span>
+</footer>
+
+</main>
+</div>
+</body>
+</html>
