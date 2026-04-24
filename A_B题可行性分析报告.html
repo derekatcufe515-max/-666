@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 北京高校数模联赛 · A/B 题可行性分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2EDE2;
+  --bg-card:#FBF7EC;
+  --ink:#1C1917;
+  --ink-soft:#57534E;
+  --ink-faint:#A8A29E;
+  --rule:#D6D3D1;
+  --rule-soft:#E7E5E4;
+  --a-accent:#7F1D1D;
+  --a-soft:#FBE9E9;
+  --a-tint:#F4DADA;
+  --b-accent:#134E4A;
+  --b-soft:#E6F3F1;
+  --b-tint:#D1E8E4;
+  --highlight:#F6E2A0;
+  --danger:#991B1B;
+  --success:#166534;
+  --warn:#B45309;
+
+  --serif-cn:'Noto Serif SC','Songti SC',serif;
+  --sans-cn:'Noto Sans SC','PingFang SC',sans-serif;
+  --serif-en:'Fraunces',Georgia,serif;
+  --display-en:'Instrument Serif','Fraunces',serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --label:'DM Sans',sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--serif-cn);
+  font-weight:400;
+  line-height:1.75;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(127,29,29,0.035) 0, transparent 50%),
+    radial-gradient(circle at 85% 70%, rgba(19,78,74,0.035) 0, transparent 55%);
+  background-attachment:fixed;
+}
+
+/* subtle paper grain */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.4;
+  z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.container{
+  max-width:1320px;
+  margin:0 auto;
+  padding:0 48px;
+  position:relative;
+  z-index:1;
+}
+
+/* ============ MASTHEAD ============ */
+.masthead{
+  padding:72px 0 56px;
+  border-bottom:1px solid var(--ink);
+  position:relative;
+}
+
+.meta-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  font-family:var(--label);
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  padding-bottom:24px;
+  border-bottom:1px solid var(--rule);
+  margin-bottom:56px;
+}
+.meta-bar .issue{font-family:var(--mono);letter-spacing:0.08em}
+.meta-bar .date{font-variant-numeric:tabular-nums}
+
+.title-group{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:40px;
+  align-items:end;
+}
+
+.main-title{
+  font-family:var(--display-en);
+  font-size:clamp(72px,10vw,148px);
+  line-height:0.9;
+  font-weight:400;
+  letter-spacing:-0.02em;
+  color:var(--ink);
+}
+.main-title .cn{
+  font-family:var(--serif-cn);
+  font-weight:500;
+  letter-spacing:-0.01em;
+}
+.main-title em{
+  font-style:italic;
+  font-family:var(--display-en);
+  color:var(--a-accent);
+  position:relative;
+}
+.main-title em::after{
+  content:'';
+  position:absolute;
+  left:0;right:0;
+  bottom:0.08em;
+  height:3px;
+  background:var(--highlight);
+  z-index:-1;
+}
+.main-title .vs{
+  font-family:var(--display-en);
+  font-style:italic;
+  color:var(--ink-faint);
+  font-size:0.6em;
+  padding:0 0.15em;
+}
+.main-title .b{color:var(--b-accent)}
+
+.tagline{
+  font-family:var(--serif-cn);
+  font-size:17px;
+  color:var(--ink-soft);
+  line-height:1.65;
+  max-width:340px;
+  text-align:right;
+  font-weight:400;
+  border-left:2px solid var(--ink);
+  padding-left:24px;
+}
+
+.subtitle{
+  margin-top:56px;
+  padding-top:32px;
+  border-top:1px solid var(--rule);
+  font-family:var(--serif-cn);
+  font-size:22px;
+  line-height:1.55;
+  color:var(--ink);
+  font-weight:400;
+  max-width:800px;
+}
+.subtitle .role{
+  font-family:var(--label);
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  display:block;
+  margin-bottom:10px;
+}
+
+/* ============ EXECUTIVE VERDICT ============ */
+.verdict{
+  margin:72px 0 96px;
+  background:var(--bg-card);
+  border:1px solid var(--ink);
+  padding:40px 48px;
+  position:relative;
+  box-shadow:8px 8px 0 0 var(--ink);
+}
+.verdict::before{
+  content:'评审裁定 · ADJUDICATION';
+  position:absolute;
+  top:-10px;
+  left:28px;
+  background:var(--bg);
+  padding:0 12px;
+  font-family:var(--label);
+  font-size:10px;
+  letter-spacing:0.22em;
+  color:var(--ink);
+  font-weight:700;
+}
+.verdict-grid{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:56px;
+  align-items:center;
+}
+.verdict-main h3{
+  font-family:var(--display-en);
+  font-size:52px;
+  line-height:1;
+  font-weight:400;
+  margin-bottom:18px;
+}
+.verdict-main h3 .cn{
+  font-family:var(--serif-cn);
+  font-weight:500;
+}
+.verdict-main h3 .pick{
+  background:var(--a-accent);
+  color:var(--bg-card);
+  padding:0 12px;
+  font-style:italic;
+}
+.verdict-main p{
+  font-size:17px;
+  line-height:1.65;
+  color:var(--ink-soft);
+}
+.verdict-main p strong{color:var(--ink);font-weight:500}
+
+.match-meter{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.meter{
+  display:grid;
+  grid-template-columns:60px 1fr 60px;
+  gap:16px;
+  align-items:center;
+}
+.meter-label{
+  font-family:var(--label);
+  font-size:13px;
+  letter-spacing:0.08em;
+  font-weight:700;
+}
+.meter-bar{
+  height:8px;
+  background:var(--rule-soft);
+  position:relative;
+  overflow:hidden;
+}
+.meter-fill{
+  position:absolute;
+  left:0;top:0;bottom:0;
+  background:var(--ink);
+}
+.meter-fill.a{background:var(--a-accent);width:85%}
+.meter-fill.b{background:var(--b-accent);width:35%}
+.meter-val{
+  font-family:var(--mono);
+  font-size:15px;
+  font-weight:500;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ============ SECTION / DIMENSION ============ */
+.dimension{
+  padding:64px 0;
+  border-bottom:1px solid var(--rule);
+  position:relative;
+}
+.dimension:last-of-type{border-bottom:none}
+
+.dim-head{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:40px;
+  align-items:baseline;
+  margin-bottom:40px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--rule);
+}
+.dim-num{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:0.1em;
+  color:var(--ink-faint);
+  font-variant-numeric:tabular-nums;
+}
+.dim-num .big{
+  font-family:var(--display-en);
+  font-style:italic;
+  font-size:64px;
+  color:var(--ink);
+  display:block;
+  line-height:0.9;
+  margin-bottom:4px;
+}
+.dim-title-block{}
+.dim-title{
+  font-family:var(--serif-cn);
+  font-size:38px;
+  font-weight:500;
+  line-height:1.15;
+  color:var(--ink);
+  letter-spacing:-0.01em;
+  margin-bottom:8px;
+}
+.dim-title .en{
+  font-family:var(--display-en);
+  font-style:italic;
+  font-weight:400;
+  color:var(--ink-faint);
+  margin-left:14px;
+  font-size:0.62em;
+}
+.dim-sub{
+  font-family:var(--serif-cn);
+  font-size:16px;
+  color:var(--ink-soft);
+  font-style:italic;
+}
+
+/* comparison cards */
+.compare{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:28px;
+}
+.compare.single{grid-template-columns:1fr}
+
+.card{
+  background:var(--bg-card);
+  padding:32px 34px;
+  position:relative;
+  border:1px solid var(--rule);
+  transition:transform 0.3s ease,box-shadow 0.3s ease;
+}
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px -8px rgba(0,0,0,0.12);
+}
+.card-a{
+  background:linear-gradient(180deg,var(--a-soft) 0%,var(--bg-card) 30%);
+  border-top:3px solid var(--a-accent);
+}
+.card-b{
+  background:linear-gradient(180deg,var(--b-soft) 0%,var(--bg-card) 30%);
+  border-top:3px solid var(--b-accent);
+}
+
+.card-head{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  padding-bottom:16px;
+  margin-bottom:20px;
+  border-bottom:1px solid var(--rule-soft);
+}
+.card-tag{
+  font-family:var(--label);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.16em;
+  padding:3px 10px;
+  border-radius:2px;
+}
+.card-a .card-tag{background:var(--a-accent);color:var(--bg-card)}
+.card-b .card-tag{background:var(--b-accent);color:var(--bg-card)}
+.card-name{
+  font-family:var(--serif-cn);
+  font-size:20px;
+  font-weight:500;
+  color:var(--ink);
+}
+
+.card-body{
+  font-family:var(--serif-cn);
+  font-size:15.5px;
+  line-height:1.8;
+  color:var(--ink);
+}
+.card-body p{margin-bottom:14px}
+.card-body p:last-child{margin-bottom:0}
+.card-body strong{font-weight:600;color:var(--ink)}
+.card-a .card-body strong.hl{background:var(--a-tint);padding:0 3px}
+.card-b .card-body strong.hl{background:var(--b-tint);padding:0 3px}
+.card-body em{font-style:italic;color:var(--ink-soft)}
+
+.card-body ul{
+  list-style:none;
+  padding:0;
+  margin:10px 0;
+}
+.card-body ul li{
+  padding-left:22px;
+  position:relative;
+  margin-bottom:8px;
+}
+.card-body ul li::before{
+  content:'—';
+  position:absolute;
+  left:0;
+  color:var(--ink-faint);
+  font-family:var(--mono);
+}
+
+/* inline mini-table */
+.mini-tbl{
+  width:100%;
+  border-collapse:collapse;
+  margin:14px 0;
+  font-size:13.5px;
+  font-family:var(--sans-cn);
+}
+.mini-tbl th,.mini-tbl td{
+  padding:9px 10px;
+  text-align:left;
+  border-bottom:1px solid var(--rule-soft);
+  vertical-align:top;
+}
+.mini-tbl thead th{
+  background:rgba(0,0,0,0.04);
+  font-family:var(--label);
+  font-size:10.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  font-weight:700;
+  color:var(--ink-soft);
+  border-bottom:1.5px solid var(--ink);
+}
+.mini-tbl td:first-child{font-weight:500;font-family:var(--serif-cn)}
+.mini-tbl td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.diff-low{color:var(--success);font-weight:500}
+.diff-mid{color:var(--warn);font-weight:500}
+.diff-hi{color:var(--danger);font-weight:600}
+.diff-xhi{color:var(--danger);font-weight:700}
+
+/* stat callout */
+.stat-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin:18px 0;
+  padding:16px 0;
+  border-top:1px solid var(--rule-soft);
+  border-bottom:1px solid var(--rule-soft);
+}
+.stat{
+  text-align:left;
+}
+.stat-num{
+  font-family:var(--display-en);
+  font-size:36px;
+  line-height:1;
+  font-weight:400;
+  font-variant-numeric:tabular-nums;
+}
+.card-a .stat-num{color:var(--a-accent)}
+.card-b .stat-num{color:var(--b-accent)}
+.stat-num .unit{
+  font-size:16px;
+  color:var(--ink-faint);
+  margin-left:2px;
+}
+.stat-lbl{
+  font-family:var(--label);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-top:6px;
+  font-weight:500;
+}
+
+/* risk badge */
+.risk-row{
+  display:flex;
+  gap:8px;
+  margin:10px 0 14px;
+  flex-wrap:wrap;
+}
+.badge{
+  font-family:var(--label);
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:0.08em;
+  padding:4px 10px;
+  border:1px solid currentColor;
+  text-transform:uppercase;
+}
+.badge.low{color:var(--success)}
+.badge.mid{color:var(--warn)}
+.badge.high{color:var(--danger)}
+.badge.solid{background:var(--ink);color:var(--bg-card);border-color:var(--ink)}
+
+/* pullquote */
+.pull{
+  font-family:var(--display-en);
+  font-style:italic;
+  font-size:22px;
+  line-height:1.4;
+  color:var(--ink);
+  padding:20px 0 18px;
+  margin:14px 0;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+}
+.pull .cn{
+  font-family:var(--serif-cn);
+  font-style:normal;
+  font-weight:500;
+}
+.pull-attr{
+  font-family:var(--label);
+  font-size:10px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-top:10px;
+}
+
+/* ============ FINAL MATRIX ============ */
+.matrix-section{
+  margin:96px 0 72px;
+  padding:48px;
+  background:var(--ink);
+  color:var(--bg-card);
+  position:relative;
+}
+.matrix-section::before{
+  content:'';
+  position:absolute;
+  top:-6px;left:-6px;right:-6px;bottom:-6px;
+  border:1px solid var(--ink);
+  z-index:-1;
+}
+.matrix-head{
+  margin-bottom:36px;
+}
+.matrix-kicker{
+  font-family:var(--label);
+  font-size:11px;
+  letter-spacing:0.22em;
+  color:var(--a-soft);
+  margin-bottom:12px;
+  font-weight:700;
+}
+.matrix-title{
+  font-family:var(--display-en);
+  font-size:56px;
+  line-height:1;
+  font-weight:400;
+  color:var(--bg-card);
+}
+.matrix-title .cn{
+  font-family:var(--serif-cn);
+  font-weight:500;
+}
+
+.matrix-tbl{
+  width:100%;
+  border-collapse:collapse;
+  font-family:var(--sans-cn);
+}
+.matrix-tbl th,.matrix-tbl td{
+  padding:14px 18px;
+  text-align:left;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.matrix-tbl thead th{
+  font-family:var(--label);
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  font-weight:700;
+  border-bottom:1px solid rgba(255,255,255,0.3);
+  padding-bottom:16px;
+}
+.matrix-tbl thead th.col-a{color:#FCA5A5}
+.matrix-tbl thead th.col-b{color:#5EEAD4}
+.matrix-tbl td{font-size:15px;font-weight:400}
+.matrix-tbl td:first-child{font-family:var(--serif-cn);font-weight:500}
+.matrix-tbl td.col-a,.matrix-tbl td.col-b{
+  font-family:var(--mono);
+  font-variant-numeric:tabular-nums;
+  font-size:14.5px;
+}
+.matrix-tbl td.winner{
+  position:relative;
+  font-weight:700;
+}
+.matrix-tbl td.winner.col-a{color:#FCA5A5}
+.matrix-tbl td.winner.col-b{color:#5EEAD4}
+.matrix-tbl td.winner::before{
+  content:'▸';
+  margin-right:6px;
+  color:inherit;
+}
+.matrix-tbl tr:hover td{background:rgba(255,255,255,0.04)}
+
+/* final recommendation */
+.final-rec{
+  margin-top:48px;
+  padding-top:40px;
+  border-top:2px solid rgba(255,255,255,0.25);
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:48px;
+  align-items:center;
+}
+.final-pick{
+  font-family:var(--display-en);
+  font-size:140px;
+  line-height:0.85;
+  font-weight:400;
+  color:var(--a-soft);
+}
+.final-pick .cn{
+  font-family:var(--serif-cn);
+  font-weight:500;
+  font-size:0.3em;
+  display:block;
+  color:var(--ink-faint);
+  letter-spacing:0.3em;
+  margin-bottom:14px;
+}
+.final-words{
+  font-family:var(--serif-cn);
+  font-size:17px;
+  line-height:1.7;
+  color:var(--bg-card);
+}
+.final-words strong{color:#FCA5A5;font-weight:600}
+
+/* footer */
+footer{
+  text-align:center;
+  padding:48px 0 32px;
+  font-family:var(--label);
+  font-size:11px;
+  letter-spacing:0.18em;
+  color:var(--ink-faint);
+  text-transform:uppercase;
+  border-top:1px solid var(--rule);
+  margin-top:32px;
+}
+footer .dot{color:var(--a-accent);margin:0 8px}
+
+/* responsive */
+@media (max-width:900px){
+  .container{padding:0 24px}
+  .title-group{grid-template-columns:1fr;gap:24px}
+  .tagline{text-align:left;max-width:none}
+  .compare{grid-template-columns:1fr}
+  .dim-head{grid-template-columns:1fr;gap:12px}
+  .verdict-grid{grid-template-columns:1fr;gap:32px}
+  .final-rec{grid-template-columns:1fr;gap:24px}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .main-title{font-size:64px}
+  .matrix-section{padding:28px}
+  .final-pick{font-size:80px}
+}
+
+/* print */
+@media print{
+  body{background:white}
+  body::before{display:none}
+  .card:hover{transform:none;box-shadow:none}
+  .matrix-section{background:#1C1917 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* scroll reveal */
+.reveal{
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 0.8s ease,transform 0.8s ease;
+}
+.reveal.in{
+  opacity:1;
+  transform:translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- ============ MASTHEAD ============ -->
+<header class="masthead">
+  <div class="meta-bar">
+    <span class="issue">Vol. 01 · Feasibility Brief</span>
+    <span class="vs-mark">北京高校数学建模校际联赛 · 2026</span>
+    <span class="date">Apr 2026</span>
+  </div>
+
+  <div class="title-group">
+    <h1 class="main-title">
+      <span class="cn">两题</span><em>对决</em><br>
+      <span class="cn" style="font-size:0.56em;color:var(--ink-faint);font-weight:400">Filter Monitor <span class="vs">vs.</span> <span class="b">Typhoon</span></span>
+    </h1>
+    <p class="tagline">为中央财经大学金融学类参赛队撰写的赛题可行性评估<br>—— 基于十年 CUMCM 阅卷视角</p>
+  </div>
+
+  <p class="subtitle">
+    <span class="role">ADVISORY NOTE</span>
+    本报告按 <strong>八维度</strong> 对 A 题《过滤设备监测》与 B 题《台风降水过程与降水生成机理》做并列可行性分析，终以一套量化匹配指标给出选题裁定。面向画像：**金融学类本科生、Python + 统计计量基础扎实、深度学习与地学数据处理经验有限**。
+  </p>
+</header>
+
+<!-- ============ EXECUTIVE VERDICT ============ -->
+<section class="verdict">
+  <div class="verdict-grid">
+    <div class="verdict-main">
+      <h3><span class="cn">锁定</span> <span class="pick">A 题</span></h3>
+      <p>
+        <strong>A 题是你们的显性优势题。</strong>退化建模、寿命预测、维护成本优化，本质对应资产折旧、违约预测、动态再平衡——金融学类的数学骨架几乎 1:1 迁移。B 题虽然天花板更高，但前置的地学数据工程会吃掉你们 15–20 个黄金小时，72h 难以跑通。
+      </p>
+    </div>
+    <div class="match-meter">
+      <div class="meter">
+        <span class="meter-label">A 题</span>
+        <div class="meter-bar"><div class="meter-fill a"></div></div>
+        <span class="meter-val">85%</span>
+      </div>
+      <div class="meter">
+        <span class="meter-label">B 题</span>
+        <div class="meter-bar"><div class="meter-fill b"></div></div>
+        <span class="meter-val">35%</span>
+      </div>
+      <p style="font-family:var(--label);font-size:10.5px;letter-spacing:0.1em;color:var(--ink-soft);margin-top:6px;text-transform:uppercase">队伍画像匹配度 · MATCH SCORE</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 01 · 本质抽象 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">01</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">本质抽象<span class="en">Essence</span></h2>
+      <p class="dim-sub">撕掉题面包装后，这道题是什么数学问题？</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">过滤设备监测</span>
+      </div>
+      <div class="card-body">
+        <p><strong class="hl">退化过程建模 + 剩余寿命预测 + 条件维护优化</strong>的复合问题，属于工业工程里的 <strong>CBM（Condition-Based Maintenance，基于状态的维护策略优化）</strong>。</p>
+        <p>三种数学成分交织：</p>
+        <ul>
+          <li><strong>时间序列 / 退化过程</strong>——透水率作为带漂移、带季节性、带冲击的随机过程</li>
+          <li><strong>剩余寿命预测（RUL）</strong>——何时 per 跌破 37？</li>
+          <li><strong>随机动态规划 / 混合整数规划</strong>——维护时点与类型的决策</li>
+        </ul>
+        <p>第 4 问是<em>灵敏性分析 + 鲁棒优化</em>。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">台风降水过程</span>
+      </div>
+      <div class="card-body">
+        <p><strong class="hl">条件时空生成建模（conditional spatio-temporal generative modeling）</strong>，属于数据驱动的物理代理模型——学习 <em>P(降水时空场 | 台风路径、强度、环境)</em> 这个条件分布并可从中采样。</p>
+        <p>三条可行路径：</p>
+        <ul>
+          <li><strong>统计路径</strong>——EOF + 核/回归方法重构</li>
+          <li><strong>机器学习路径</strong>——U-Net / ConvLSTM / 树模型</li>
+          <li><strong>生成式路径</strong>——cGAN / Conditional Diffusion</li>
+        </ul>
+        <p><strong>陷阱提示：</strong>这不是纯预测题。Q2 要求对"有路径但无降水记录"的历史台风做条件采样；Q3 是分布外外推。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 02 · 子问题拆解 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">02</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">子问题拆解<span class="en">Structure</span></h2>
+      <p class="dim-sub">各子问题的链路与依赖关系</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题 · 4 问</span>
+        <span class="card-name">严格链式 Q1→Q2→Q3→Q4</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Q1</strong> 数据清洗 + 三类维护效应识别 + <em>指标体系</em></li>
+          <li><strong>Q2</strong> 固定维护规律下的寿命预测（需含预测区间）</li>
+          <li><strong>Q3</strong> 最优维护方案使年均成本最小 <em>（决策变量：每年大/中维护次数与时点）</em></li>
+          <li><strong>Q4</strong> 成本扰动下方案稳健性 + 决策翻转阈值</li>
+        </ul>
+        <p><strong>关键耦合：</strong>Q1 指标体系会直接写死 Q2–Q4 的变量定义。常见失误：只给一个"下降速率"标量，正确做法是给出<strong class="hl">三元结构</strong>（趋势率 + 周期振幅 + 维护三元增益）。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题 · 3 问</span>
+        <span class="card-name">链式 Q1→Q2→Q3，Q1 可并行</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Q1a</strong> 台风特征工程（路径 / 强度 / 风速半径）</li>
+          <li><strong>Q1b</strong> 降水分布指标（中心偏移 / 非对称性 / 带宽）</li>
+          <li><strong>Q1c</strong> 特征↔降水的定量映射</li>
+          <li><strong>Q1d</strong> 时空关系可视化（题目点名要）</li>
+          <li><strong>Q2</strong> 为 KONG-REY、MAN-YI 生成降水场（无 GT）</li>
+          <li><strong>Q3</strong> 虚拟台风情景 + 未来极端降水趋势</li>
+        </ul>
+        <p><strong>关键耦合：</strong>Q1 的特征体系必须<em>倒推包含</em> Q3 情景所需变量——否则 Q3 要重搭模型。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 03 · 数据情况 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">03</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">数据情况<span class="en">Data</span></h2>
+      <p class="dim-sub">数据规模、格式、质量、是否需外部补充</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">自给自足 · 结构化 · 小体量</span>
+      </div>
+      <div class="card-body">
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num">10<span class="unit">台</span></div>
+            <div class="stat-lbl">设备</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">~11<span class="unit">万行</span></div>
+            <div class="stat-lbl">小时级数据</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">2<span class="unit">年</span></div>
+            <div class="stat-lbl">跨度</div>
+          </div>
+        </div>
+        <p><strong>附件 1：</strong>10 个 sheet（A_1–A_10），每表约 10,800–11,900 行，字段 <code>time</code> + <code>per</code>。<br>
+        <strong>附件 2：</strong>128 条维护记录（编号 / 日期 / 类型）。</p>
+        <p><strong>数据质量警报：</strong></p>
+        <ul>
+          <li>A_3 开头大量 <code>None</code>，其他 sheet 也需逐一扫缺失率</li>
+          <li>各 sheet 起始时间不统一 → 设备投用时点有差异</li>
+          <li>附件 2 精度是"天"，附件 1 是"小时" → <strong>对齐需容差</strong></li>
+          <li><strong class="hl">小维护无记录</strong>（隐性扰动每 3–5 天一次）</li>
+        </ul>
+        <p><strong>外部数据：</strong><span style="color:var(--success);font-weight:600">不需要</span>。季节性用时间哑变量即可。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">异源异构 · 栅格 · 超大体量</span>
+      </div>
+      <div class="card-body">
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num">~180<span class="unit">场</span></div>
+            <div class="stat-lbl">台风</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">30<span class="unit">min</span></div>
+            <div class="stat-lbl">降水分辨率</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">~GB<span class="unit">级</span></div>
+            <div class="stat-lbl">下载量</div>
+          </div>
+        </div>
+        <p><strong>CMABSTdata（路径）：</strong>CMA Best Track 2014–2025，6h 一条，几 MB 文本。<br>
+        <strong>GPM_3IMERGHHE.07（降水）：</strong>NASA IMERG Late V07，0.1° × 0.1° 栅格，<strong>HDF5 格式</strong>，需 <code>h5py</code> / <code>xarray</code>。</p>
+        <p><strong>外部数据（自行补充）：</strong></p>
+        <ul>
+          <li>海陆分布（cartopy 自带）</li>
+          <li>地形（ETOPO1 / SRTM，几 GB）</li>
+          <li>环境场（ERA5 —— 真正做深要靠这个）</li>
+        </ul>
+        <p><strong class="hl">陷阱：</strong>KONG-REY 与 MAN-YI 在 GPM 中无降水记录（Q2 核心）；2024-11 多台风重叠，须靠名称 + 时间 + 经纬度严格匹配。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 04 · 核心难点 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">04</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">核心难点<span class="en">Choke Points</span></h2>
+      <p class="dim-sub">按卡住概率降序列出——这三点决定成败</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">卡点集中在 Q3 的优化落地</span>
+      </div>
+      <div class="card-body">
+        <div class="risk-row">
+          <span class="badge high">60% · 中高风险</span>
+          <span class="badge mid">45% · 中风险</span>
+          <span class="badge low">30% · 中低风险</span>
+        </div>
+        <p><strong>#1 小维护的隐式建模（60%）</strong><br>题目说每 3–5 天一次但没记录。你要决定是当"已知周期扰动"吸收进基线，还是用变点检测反推时点。前者简单后者严谨——队伍容易在这里纠结一天。</p>
+        <p><strong>#2 Q3 的分式规划（45%）</strong><br>年均成本 = (折旧 + 维护费) / 寿命，分子分母都依赖决策变量。处理：<em>Dinkelbach 算法</em>化线性、<em>离散化 + DP</em>、或直接启发式兜底。金融学类有天然优势——和分式投资组合是一个骨架。</p>
+        <p><strong>#3 三类维护参数标定（30%）</strong><br>每种维护的"提升幅度—衰减—季节依赖"至少 3 参数，三类共 9+。需要双指数衰减 + 非线性最小二乘。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">三个卡点都可能致命</span>
+      </div>
+      <div class="card-body">
+        <div class="risk-row">
+          <span class="badge high">75% · 极高风险</span>
+          <span class="badge high">65% · 高风险</span>
+          <span class="badge mid">55% · 中高风险</span>
+        </div>
+        <p><strong>#1 GPM 数据的下载/读取/对齐（75%）</strong><br>对没碰过气象遥感数据的队，光"读进来对齐到台风路径"可能卡 1.5–2 天。HDF5、半小时时间戳、经纬度投影、<em>storm-centered 极坐标</em> 转换——<strong class="hl">这一关不过全题停摆</strong>。</p>
+        <p><strong>#2 Q2 生成模型选择（65%）</strong><br>最大风险：选了深度生成模型但 72h 根本训不好。KNN 类比最保险但平庸；cGAN / Diffusion 创新高但需 GPU 且调参周期长。</p>
+        <p><strong>#3 合理性论证（55%）</strong><br>无 ground truth 如何证明生成对？需自设评估指标（与相似台风对比 / 物理约束 / 可视化）。设计不合理 = 直接压分。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 05 · 方法工具箱 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">05</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">方法工具箱<span class="en">Toolkit</span></h2>
+      <p class="dim-sub">每子问题给出 2–3 种候选方法与推荐路线</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">候选方法矩阵</span>
+      </div>
+      <div class="card-body">
+        <table class="mini-tbl">
+          <thead>
+            <tr><th>子问题</th><th>方法</th><th>难度</th><th>创新</th></tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="3">Q1</td><td>STL 分解 + ruptures 变点</td><td class="diff-low">低</td><td class="diff-low">低</td></tr>
+            <tr><td>Savitzky-Golay + 阶跃检测</td><td class="diff-mid">中</td><td class="diff-mid">中</td></tr>
+            <tr><td>小波 + CUSUM 变点</td><td class="diff-hi">高</td><td class="diff-hi">高</td></tr>
+            <tr><td rowspan="3">Q2</td><td><strong>Wiener 过程 + 维护脉冲</strong></td><td class="diff-mid">中</td><td class="diff-hi">中高</td></tr>
+            <tr><td>SARIMA + 维护外生变量</td><td class="diff-low">低</td><td class="diff-low">低</td></tr>
+            <tr><td>LSTM 序列预测</td><td class="diff-mid">中</td><td class="diff-mid">中</td></tr>
+            <tr><td rowspan="3">Q3</td><td><strong>MDP + 值迭代</strong></td><td class="diff-hi">高</td><td class="diff-hi">高</td></tr>
+            <tr><td>MIP + Dinkelbach</td><td class="diff-hi">中高</td><td class="diff-hi">高</td></tr>
+            <tr><td>遗传算法（兜底）</td><td class="diff-low">低</td><td class="diff-low">低</td></tr>
+            <tr><td rowspan="2">Q4</td><td><strong>MC 扰动 + Sobol 指数</strong></td><td class="diff-mid">中</td><td class="diff-mid">中</td></tr>
+            <tr><td>鲁棒优化 min-max</td><td class="diff-hi">高</td><td class="diff-hi">高</td></tr>
+          </tbody>
+        </table>
+        <p><strong>推荐路线：</strong>STL + ruptures → <strong class="hl">Wiener 过程</strong> → <strong class="hl">MDP 值迭代</strong>（遗传算法对照）→ MC + Sobol。金融学类对 Wiener、MDP、MC 都是主场。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">候选方法矩阵</span>
+      </div>
+      <div class="card-body">
+        <table class="mini-tbl">
+          <thead>
+            <tr><th>子问题</th><th>方法</th><th>难度</th><th>创新</th></tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="3">Q1</td><td>象限功率 + 多元回归</td><td class="diff-mid">中</td><td class="diff-low">低</td></tr>
+            <tr><td>EOF + 典型相关分析</td><td class="diff-hi">中高</td><td class="diff-mid">中</td></tr>
+            <tr><td><strong>随机森林 + SHAP</strong></td><td class="diff-mid">中</td><td class="diff-mid">中高</td></tr>
+            <tr><td rowspan="5">Q2</td><td>KNN 相似台风检索</td><td class="diff-low">低</td><td class="diff-mid">中</td></tr>
+            <tr><td><strong>storm-centered 合成 + 路径重投影</strong></td><td class="diff-mid">中</td><td class="diff-hi">中高</td></tr>
+            <tr><td>核条件密度估计</td><td class="diff-hi">中高</td><td class="diff-hi">中高</td></tr>
+            <tr><td>cGAN（pix2pix 改造）</td><td class="diff-xhi">高</td><td class="diff-xhi">高</td></tr>
+            <tr><td>Conditional Diffusion</td><td class="diff-xhi">极高</td><td class="diff-xhi">极高</td></tr>
+            <tr><td rowspan="2">Q3</td><td>Q2 模型上做扰动</td><td>跟随 Q2</td><td class="diff-mid">中</td></tr>
+            <tr><td>IPCC 情景 + 物理参数化</td><td class="diff-mid">中</td><td class="diff-hi">高</td></tr>
+          </tbody>
+        </table>
+        <p><strong>推荐路线：</strong>象限分析 + 随机森林 → <strong class="hl">storm-centered 合成法</strong>（KNN 兜底）→ IPCC 情景扰动。<strong>cGAN / Diffusion 千万别上</strong>，除非队里有深度学习研究员。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 06 · 失分点 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">06</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">常见失分点<span class="en">Pitfalls</span></h2>
+      <p class="dim-sub">历年阅卷高频扣分项</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">论文 &gt; 建模 &gt; 求解 &gt; 格式</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Q1 指标单薄</strong>——只给"月均下降速率"，应给<em>趋势 + 周期 + 维护三元</em></li>
+          <li><strong>Q2 无置信区间</strong>——寿命预测必须带预测区间</li>
+          <li><strong>三类维护合并处理</strong>——题目特意区分大/中/小</li>
+          <li><strong class="hl">年均成本公式写错</strong>——忘了 300 万折旧分摊到寿命年数。<em>这是最致命的错</em></li>
+          <li><strong>Q4 扰动幅度拍脑袋</strong>——"20% 浮动"无依据。用<em>历史价格波动率</em>给依据（金融学类顺手）</li>
+          <li><strong>缺关键图</strong>——至少 3 张：①完整曲线 + 维护标记；②维护前后对比；③最优方案 vs 当前方案成本柱图</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">地板分数极低的题</span>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li><strong>数据处理不透明</strong>——没讲清楚 HDF5 怎么抽、怎么对齐</li>
+          <li><strong class="hl">KONG-REY 与 MAN-YI 搞错</strong>——题目明确警告名称相似/时间重叠</li>
+          <li><strong>合理性指标缺失</strong>——Q2 只放几张图不给评估方法</li>
+          <li><strong>可视化敷衍</strong>——台风题"图为王"，无合格的路径叠加降水场图 = 直接压分</li>
+          <li><strong>物理约束违反</strong>——生成降水出现负值 / 尖刺 / 空间不连续</li>
+          <li><strong>Q3 情景离谱</strong>——造出跨越大陆 2000 公里还加强的台风</li>
+          <li><strong>模型黑盒化</strong>——讲不清"为什么 MAN-YI 的降水应该长这样"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 07 · 工时估算 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">07</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">72 小时工作量<span class="en">Hours</span></h2>
+      <p class="dim-sub">建模 / 编程 / 论文 三段分解，标出瓶颈</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">卡线 72h · 可完成</span>
+      </div>
+      <div class="card-body">
+        <table class="mini-tbl">
+          <thead>
+            <tr><th>阶段</th><th class="num">小时</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>数据清洗 + EDA</td><td class="num">6</td><td>A_3 坏 sheet 警惕</td></tr>
+            <tr><td>Q1 建模编程</td><td class="num">10</td><td>STL + ruptures + 标定</td></tr>
+            <tr><td>Q2 建模编程</td><td class="num">12</td><td>Wiener 推导 4h</td></tr>
+            <tr><td><strong>Q3 建模编程</strong></td><td class="num"><strong>16</strong></td><td class="diff-hi">★ 瓶颈</td></tr>
+            <tr><td>Q4</td><td class="num">6</td><td>MC + Sobol</td></tr>
+            <tr><td>论文撰写</td><td class="num">18</td><td>正文 + 摘要 + 图表</td></tr>
+            <tr><td>缓冲</td><td class="num">4</td><td>—</td></tr>
+            <tr style="border-top:2px solid var(--ink)"><td><strong>合计</strong></td><td class="num"><strong>72</strong></td><td><span class="diff-low">可完成</span></td></tr>
+          </tbody>
+        </table>
+        <p><strong>瓶颈：Q3 编程落地。</strong>若无人能写 MDP 值迭代或 <code>pulp</code> MIP，Q3 将拖到 24h+。<em>建议赛前两天专门练 pulp 小例子</em>。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">80h · 超出 72h 上限</span>
+      </div>
+      <div class="card-body">
+        <table class="mini-tbl">
+          <thead>
+            <tr><th>阶段</th><th class="num">小时</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>数据下载 + 环境搭建</strong></td><td class="num"><strong>12</strong></td><td class="diff-hi">★ 额外成本</td></tr>
+            <tr><td>路径—降水对齐</td><td class="num">8</td><td>storm-centered 坐标</td></tr>
+            <tr><td>Q1 建模编程</td><td class="num">10</td><td>特征工程 + 回归</td></tr>
+            <tr><td><strong>Q2 建模编程</strong></td><td class="num"><strong>20</strong></td><td class="diff-xhi">★★ 最大瓶颈</td></tr>
+            <tr><td>Q3</td><td class="num">10</td><td>情景 + 外推</td></tr>
+            <tr><td>论文撰写</td><td class="num">16</td><td>大量图表</td></tr>
+            <tr><td>缓冲</td><td class="num">4</td><td>—</td></tr>
+            <tr style="border-top:2px solid var(--ink)"><td><strong>合计</strong></td><td class="num"><strong>80</strong></td><td><span class="diff-hi">超时</span></td></tr>
+          </tbody>
+        </table>
+        <p><strong>双瓶颈：</strong>①地学数据处理栈搭建（非气象背景硬卡点）；②Q2 生成模型。<strong class="hl">任何一个打不穿全盘崩</strong>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIM 08 · 一句话总结 ============ -->
+<section class="dimension">
+  <div class="dim-head">
+    <div class="dim-num"><span class="big">08</span>/ 08</div>
+    <div class="dim-title-block">
+      <h2 class="dim-title">一句话总结<span class="en">Verdict</span></h2>
+      <p class="dim-sub">适合什么样的队伍？不适合什么样的队伍？</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="card card-a">
+      <div class="card-head">
+        <span class="card-tag">A 题</span>
+        <span class="card-name">对金融学类高度友好</span>
+      </div>
+      <div class="card-body">
+        <div class="pull">
+          <span class="cn">退化建模 ≈ 资产折旧<br>寿命预测 ≈ 违约预测<br>维护决策 ≈ 动态再平衡<br>Q4 ≈ 压力测试</span>
+          <div class="pull-attr">— 金融学类的数学骨架 1:1 迁移</div>
+        </div>
+        <p><strong class="hl">适合：</strong>有 1 名编程可靠成员（能写循环迭代 / 调 pulp）+ 熟统计的队伍。经济学直觉在 Q3、Q4 是<em>加分项</em>。</p>
+        <p><strong>不适合：</strong>三人都没写过优化求解代码、或没耐心做数据清洗的队伍。</p>
+      </div>
+    </div>
+    <div class="card card-b">
+      <div class="card-head">
+        <span class="card-tag">B 题</span>
+        <span class="card-name">博天花板但风险极大</span>
+      </div>
+      <div class="card-body">
+        <div class="pull">
+          <span class="cn">数据工程的前置成本<br>会吃掉你们大半时间<br>还没开始建模<br>论文周期就过半</span>
+          <div class="pull-attr">— 金融学类选 B 的最大风险</div>
+        </div>
+        <p><strong>适合：</strong>队内至少 1 人熟 Python 地学栈（xarray / cartopy / h5py）或有深度学习项目实战的队伍。最理想是大气 / 地理 / 遥感专业。</p>
+        <p><strong class="hl">不适合：</strong>纯金融 / 经济 / 管理背景的队伍——<strong>强烈不推荐中财金融学类选 B</strong>，除非队里有 1 位 CS 或气象 / 地理背景的同学愿意全包数据处理。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL MATRIX ============ -->
+<section class="matrix-section">
+  <div class="matrix-head">
+    <div class="matrix-kicker">▸ FINAL SCORECARD · 横向对比速查</div>
+    <h3 class="matrix-title"><span class="cn">八维矩阵</span> <em>Scorecard</em></h3>
+  </div>
+
+  <table class="matrix-tbl">
+    <thead>
+      <tr>
+        <th>维度</th>
+        <th class="col-a">A 题 · 设备监测</th>
+        <th class="col-b">B 题 · 台风降水</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>数据工程门槛</td><td class="col-a winner">低</td><td class="col-b">高</td></tr>
+      <tr><td>数学门槛</td><td class="col-a">中</td><td class="col-b">中</td></tr>
+      <tr><td>编程门槛</td><td class="col-a winner">中</td><td class="col-b">高</td></tr>
+      <tr><td>物理背景依赖</td><td class="col-a winner">低</td><td class="col-b">中</td></tr>
+      <tr><td>金融学类契合度</td><td class="col-a winner">高</td><td class="col-b">低</td></tr>
+      <tr><td>72h 可完成度</td><td class="col-a winner">85%</td><td class="col-b">55%</td></tr>
+      <tr><td>天花板分数</td><td class="col-a">中高</td><td class="col-b winner">高</td></tr>
+      <tr><td>地板分数</td><td class="col-a winner">中</td><td class="col-b">低</td></tr>
+    </tbody>
+  </table>
+
+  <div class="final-rec">
+    <div class="final-pick">
+      <span class="cn">最 终 建 议</span>
+      A
+    </div>
+    <div class="final-words">
+      <p><strong>锁定 A 题。</strong>B 题天花板确实更高，但对纯金融学类画像，地板风险（数据工程 + 生成模型双瓶颈）远大于天花板收益。A 题的所有关键数学工具——Wiener 过程、MDP、Monte Carlo、灵敏性分析——都是你们的主场；Q3 的分式规划与 Q4 的鲁棒性分析，反而是金融学类可以<em>相对其他队伍</em>打出差异化的环节。</p>
+      <p style="margin-top:16px;font-size:15px;color:var(--ink-faint)">若决定开赛前再做最终确认，用下述标准：<strong style="color:#5EEAD4">若队内无人熟练使用 xarray/h5py/cartopy，B 题一律弃选。</strong></p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  北京高校数学建模校际联赛 <span class="dot">·</span> 2026 <span class="dot">·</span> Feasibility Brief
+</footer>
+
+<script>
+// Staggered reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in'), i * 80);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.card, .dim-head, .matrix-section').forEach(el => {
+  el.classList.add('reveal');
+  io.observe(el);
+});
+</script>
+
+</body>
+</html>
