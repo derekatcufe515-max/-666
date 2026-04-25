@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A题论文诊断报告 · 22 项问题清单与改进建议</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --paper-2:#F3ECDD;
+    --ink:#15202B;
+    --ink-2:#3D4B5A;
+    --ink-3:#7A8593;
+    --rule:#D9CFBC;
+    --rule-2:#E8DFC9;
+    --accent:#8B2E1F;
+    --accent-2:#B85A3C;
+    --ochre:#C08A3E;
+    --olive:#4E5D3A;
+    --ink-soft:#27313D;
+    --crit:#A81E0F;       /* 致命 */
+    --warn:#C68A2B;       /* 严重 */
+    --imp:#5A7041;        /* 优化 */
+    --note:#7A8593;       /* 细节 */
+    --code-bg:#1F2730;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans SC','PingFang SC','Helvetica Neue',sans-serif;
+    font-size:15px;
+    line-height:1.75;
+    font-feature-settings:"palt";
+    background-image:
+      radial-gradient(1px 1px at 25% 30%, rgba(21,32,43,.04) 50%, transparent 50%),
+      radial-gradient(1px 1px at 75% 70%, rgba(21,32,43,.03) 50%, transparent 50%);
+    background-size: 12px 12px, 20px 20px;
+  }
+  .shell{
+    display:grid;
+    grid-template-columns: 260px minmax(0,1fr);
+    max-width:1380px;
+    margin:0 auto;
+  }
+  /* ============= 侧边导航 ============= */
+  nav.toc{
+    position:sticky; top:0; height:100vh;
+    padding:36px 24px 36px 36px;
+    border-right:1px solid var(--rule);
+    overflow-y:auto;
+    background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  }
+  nav.toc .brand{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:11px;
+    letter-spacing:.28em;
+    color:var(--crit);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  nav.toc .brand-sub{
+    font-family:'Noto Serif SC',serif;
+    font-size:12px;
+    color:var(--ink-3);
+    letter-spacing:.08em;
+    margin-bottom:24px;
+  }
+  nav.toc .legend{
+    display:flex; flex-direction:column; gap:6px;
+    padding:12px 0;
+    margin-bottom:18px;
+    border-top:1px dashed var(--rule);
+    border-bottom:1px dashed var(--rule);
+    font-size:11px;
+    font-family:'Fraunces',serif;
+    letter-spacing:.04em;
+  }
+  nav.toc .legend .row{display:flex; gap:8px; align-items:center}
+  nav.toc .legend .dot{width:9px;height:9px;border-radius:50%}
+  .dot.crit{background:var(--crit)}
+  .dot.warn{background:var(--warn)}
+  .dot.imp{background:var(--imp)}
+  .dot.note{background:var(--note)}
+  nav.toc ol{ list-style:none; padding:0; margin:0; }
+  nav.toc li{ margin-bottom:1px; }
+  nav.toc a{
+    display:flex; align-items:center; gap:8px;
+    padding:7px 8px 7px 0;
+    text-decoration:none;
+    color:var(--ink-2);
+    font-size:12.5px;
+    border-bottom:1px dashed transparent;
+    transition: all .15s ease;
+  }
+  nav.toc a .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    color:var(--accent);
+    font-weight:700;
+    min-width:22px;
+  }
+  nav.toc a:hover{ color:var(--accent); border-bottom-color:var(--accent); }
+  nav.toc .sec-label{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:11px;
+    color:var(--ink-3);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin:14px 0 4px 0;
+  }
+
+  /* ============= 主体 ============= */
+  main{
+    padding:48px 64px 110px 64px;
+    max-width:100%;
+  }
+  .masthead{
+    border-top:2px solid var(--ink);
+    border-bottom:1px solid var(--ink);
+    padding:16px 0 18px 0;
+    margin-bottom:36px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Fraunces',serif;
+    font-size:11px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-2);
+  }
+  .masthead .issue{color:var(--crit);font-weight:800}
+
+  /* ============= Hero ============= */
+  .hero{ margin-bottom:48px; }
+  .kicker{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--crit);
+    letter-spacing:.08em;
+    margin-bottom:8px;
+  }
+  h1.title{
+    font-family:'Noto Serif SC',serif;
+    font-weight:900;
+    font-size:clamp(36px, 4.6vw, 60px);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin:0 0 16px 0;
+    color:var(--ink);
+  }
+  h1.title em{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    color:var(--crit);
+  }
+  .subtitle{
+    font-family:'Noto Serif SC',serif;
+    font-weight:400;
+    font-size:17px;
+    color:var(--ink-2);
+    max-width:760px;
+    line-height:1.65;
+    margin:0 0 22px 0;
+    border-left:3px solid var(--crit);
+    padding-left:16px;
+  }
+  .verdict{
+    background:linear-gradient(180deg, #FFFFFF 0%, var(--paper-2) 100%);
+    border:1px solid var(--rule);
+    border-left:5px solid var(--crit);
+    padding:18px 22px;
+    margin:0 0 28px 0;
+  }
+  .verdict h3{
+    font-family:'Noto Serif SC',serif;
+    margin:0 0 8px 0;
+    font-size:16px;
+    color:var(--crit);
+  }
+  .verdict p{font-size:14px;color:var(--ink-2);margin:0}
+  .hero-meta{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:0;
+    border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+    padding:18px 0;
+  }
+  .hero-meta .cell{ padding:0 18px; border-left:1px solid var(--rule); }
+  .hero-meta .cell:first-child{border-left:none;padding-left:0}
+  .hero-meta .lbl{
+    font-family:'Fraunces',serif;
+    font-size:10px; letter-spacing:.25em; text-transform:uppercase;
+    color:var(--ink-3); margin-bottom:4px;
+  }
+  .hero-meta .val{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700; font-size:24px; color:var(--ink);
+  }
+  .hero-meta .val.crit{color:var(--crit)}
+  .hero-meta .val.warn{color:var(--warn)}
+  .hero-meta .val small{
+    font-family:'Noto Sans SC',sans-serif;
+    font-weight:400; font-size:11px; color:var(--ink-3);
+  }
+
+  /* ============= 章节 ============= */
+  section{ margin:64px 0 0 0; scroll-margin-top:30px; }
+  section > header.sec-head{
+    display:flex; align-items:baseline; gap:22px;
+    margin-bottom:24px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--ink);
+  }
+  section > header.sec-head .num{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:64px;
+    line-height:.85;
+    color:var(--crit);
+    letter-spacing:-.02em;
+  }
+  section > header.sec-head .num em{ font-style:normal; color:var(--ink-3); font-weight:400; }
+  section > header.sec-head .tit{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:26px;
+    line-height:1.2;
+    color:var(--ink);
+    margin:0;
+  }
+  section > header.sec-head .tit small{
+    display:block;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:13px;
+    color:var(--ink-3);
+    letter-spacing:.05em;
+    margin-top:4px;
+  }
+  p{margin:0 0 12px 0}
+  p.lead{ font-size:15.5px; color:var(--ink-2); margin-bottom:18px; }
+
+  /* ============= 问题卡 ============= */
+  .issue{
+    background:#FFFFFF;
+    border:1px solid var(--rule);
+    margin:18px 0;
+    display:grid;
+    grid-template-columns:62px 1fr;
+    overflow:hidden;
+  }
+  .issue .gutter{
+    background:var(--ink-soft);
+    color:#FFF;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding:14px 4px;
+    text-align:center;
+  }
+  .issue.crit .gutter{background:var(--crit)}
+  .issue.warn .gutter{background:var(--warn)}
+  .issue.imp .gutter{background:var(--imp)}
+  .issue.note .gutter{background:var(--note)}
+  .issue .gutter .num{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:26px;
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .issue .gutter .lvl{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:9px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    margin-top:8px;
+    opacity:.8;
+  }
+  .issue .body{ padding:18px 22px 20px 22px; }
+  .issue .body h3{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:18px;
+    margin:0 0 4px 0;
+    color:var(--ink);
+    line-height:1.3;
+  }
+  .issue .body .loc{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-3);
+    margin-bottom:12px;
+    padding-bottom:8px;
+    border-bottom:1px dotted var(--rule);
+  }
+  .issue .body .loc b{color:var(--accent);font-weight:600}
+  .issue .body .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-top:8px;
+  }
+  .issue .body .grid > div{ font-size:13.5px; }
+  .issue .body .grid h4{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin:0 0 5px 0;
+    font-weight:700;
+  }
+  .issue .body .grid p{font-size:13.5px;color:var(--ink-2);margin:0 0 6px 0}
+  .issue .body .grid b{color:var(--ink);font-weight:600}
+  .issue .body .full{
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px dotted var(--rule);
+  }
+  .issue .body .full h4{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--imp);
+    margin:0 0 8px 0;
+    font-weight:700;
+  }
+  .issue.crit .body .full h4{color:var(--crit)}
+  .issue.warn .body .full h4{color:var(--warn)}
+  .issue .body .full p{font-size:13.5px;color:var(--ink-2);margin-bottom:8px}
+  .issue .body .full b{color:var(--ink)}
+
+  /* ============= 代码块 ============= */
+  .code{
+    background:var(--code-bg);
+    color:#E8DFC9;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    line-height:1.6;
+    padding:14px 18px;
+    margin:10px 0;
+    border-left:3px solid var(--ochre);
+    overflow-x:auto;
+    white-space:pre;
+  }
+  .code .h{color:#FF9966}      /* highlight */
+  .code .c{color:#7A8593}      /* comment */
+  .code .k{color:#C0E0FF}      /* keyword */
+  .code .s{color:#FFC892}      /* string */
+  .code .d{color:#F4DDD5}      /* delete */
+  .code .a{color:#A8D188}      /* add */
+  .code .n{color:#7A8593;display:inline-block;width:2.2em;text-align:right;padding-right:8px}
+
+  .latex-patch{
+    background:#FFFCF6;
+    border:1px solid var(--rule);
+    border-left:4px solid var(--imp);
+    margin:10px 0;
+  }
+  .latex-patch .label{
+    background:var(--imp);
+    color:#FFF;
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    padding:5px 14px;
+    font-weight:700;
+  }
+  .latex-patch .label.crit{background:var(--crit)}
+  .latex-patch pre{
+    margin:0;
+    padding:14px 18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink);
+    line-height:1.55;
+    white-space:pre-wrap;
+    overflow-x:auto;
+    background:#FFFCF6;
+  }
+  .latex-patch pre .com{color:var(--imp);font-style:italic}
+  .latex-patch pre .del{color:#A81E0F;text-decoration:line-through;opacity:.7}
+  .latex-patch pre .add{color:var(--accent);background:#F4E2DA;padding:0 2px}
+  .latex-patch pre .keep{color:var(--ink-3)}
+
+  /* ============= 证据卡 ============= */
+  .evidence{
+    background:var(--paper-2);
+    border:1px dashed var(--rule);
+    padding:12px 16px;
+    margin:10px 0;
+    font-size:13px;
+    color:var(--ink-2);
+  }
+  .evidence .lbl{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .evidence table{
+    width:100%;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    border-collapse:collapse;
+  }
+  .evidence table td{padding:3px 8px;border-bottom:1px dotted var(--rule)}
+  .evidence table td:first-child{color:var(--ink);font-weight:600;width:90px}
+  .evidence table td.crit{color:var(--crit);font-weight:700}
+  .evidence table td.ok{color:var(--imp);font-weight:600}
+  .evidence em{font-style:italic;color:var(--ink-2)}
+
+  /* ============= 分级标签 ============= */
+  .pill{
+    display:inline-block;
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    padding:2px 9px;
+    border-radius:1px;
+    color:#FFF;
+  }
+  .pill.crit{background:var(--crit)}
+  .pill.warn{background:var(--warn)}
+  .pill.imp{background:var(--imp)}
+  .pill.note{background:var(--note)}
+
+  /* ============= 优先级清单 ============= */
+  .roadmap{
+    background:#FFFFFF;
+    border:2px solid var(--ink);
+    margin:24px 0 0 0;
+  }
+  .roadmap-row{
+    display:grid;
+    grid-template-columns:54px 90px 110px 1fr 110px 100px;
+    align-items:center;
+    padding:14px 22px;
+    border-bottom:1px dotted var(--rule);
+    gap:14px;
+    font-size:13.5px;
+  }
+  .roadmap-row:last-child{border-bottom:none}
+  .roadmap-row .rk{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:24px;
+    color:var(--accent);
+  }
+  .roadmap-row .pr{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .pr.p1{color:var(--crit)}
+  .pr.p2{color:var(--warn)}
+  .pr.p3{color:var(--imp)}
+  .roadmap-row .iss{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-3);
+  }
+  .roadmap-row .task b{font-family:'Noto Serif SC',serif;font-weight:700;color:var(--ink)}
+  .roadmap-row .eta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-3);
+    text-align:right;
+  }
+  .roadmap-row .effort{
+    font-family:'Fraunces',serif;
+    font-size:11px;
+    letter-spacing:.05em;
+    color:var(--ink-2);
+  }
+
+  /* ============= 总览盒 ============= */
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+    margin:18px 0 8px 0;
+  }
+  .sumbox{
+    background:#FFFFFF;
+    border:1px solid var(--rule);
+    border-top:4px solid var(--crit);
+    padding:16px 18px;
+    text-align:left;
+  }
+  .sumbox.warn{border-top-color:var(--warn)}
+  .sumbox.imp{border-top-color:var(--imp)}
+  .sumbox.note{border-top-color:var(--note)}
+  .sumbox .n{
+    font-family:'Fraunces',serif;
+    font-weight:800;
+    font-size:42px;
+    line-height:1;
+    color:var(--crit);
+  }
+  .sumbox.warn .n{color:var(--warn)}
+  .sumbox.imp .n{color:var(--imp)}
+  .sumbox.note .n{color:var(--note)}
+  .sumbox .lbl{
+    font-family:'Fraunces',serif;
+    font-size:10px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin:8px 0 4px 0;
+  }
+  .sumbox p{font-size:12.5px;color:var(--ink-2);margin:0;line-height:1.5}
+
+  /* ============= 表格通用 ============= */
+  table.tbl{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    margin:12px 0;
+    background:#FFFFFF;
+    border-top:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+  }
+  table.tbl th{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    color:var(--ink);
+    text-align:left;
+    padding:10px 12px;
+    border-bottom:1px solid var(--ink);
+    background:var(--paper-2);
+    font-size:12px;
+    letter-spacing:.04em;
+  }
+  table.tbl td{
+    padding:8px 12px;
+    border-bottom:1px solid var(--rule-2);
+    vertical-align:top;
+    color:var(--ink-2);
+  }
+  table.tbl tr:last-child td{border-bottom:none}
+  table.tbl td code, table.tbl td .sym{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--accent);
+    font-weight:600;
+  }
+
+  /* ============= 备注/小字 ============= */
+  .note-line{
+    font-size:12.5px;
+    color:var(--ink-3);
+    font-style:italic;
+    margin-top:8px;
+    padding-left:12px;
+    border-left:2px solid var(--rule);
+    line-height:1.6;
+  }
+  h3.sub{
+    font-family:'Noto Serif SC',serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--ink);
+    margin:28px 0 12px 0;
+    padding-left:14px;
+    position:relative;
+  }
+  h3.sub::before{
+    content:""; position:absolute; left:0; top:6px;
+    width:5px; height:20px; background:var(--accent);
+  }
+
+  footer.colophon{
+    margin-top:80px;
+    padding-top:24px;
+    border-top:2px solid var(--ink);
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:13px;
+    color:var(--ink-3);
+    display:flex; justify-content:space-between;
+    letter-spacing:.05em;
+  }
+  footer.colophon .sig{color:var(--crit);font-weight:600}
+
+  @media (max-width: 980px){
+    .shell{grid-template-columns:1fr}
+    nav.toc{position:static; height:auto; border-right:none; border-bottom:1px solid var(--rule)}
+    main{padding:36px 24px 70px 24px}
+    .hero-meta{grid-template-columns:repeat(2,1fr)}
+    .hero-meta .cell{border-left:none;border-top:1px solid var(--rule);padding-top:12px}
+    .hero-meta .cell:first-child,.hero-meta .cell:nth-child(2){border-top:none}
+    .summary-grid{grid-template-columns:repeat(2,1fr)}
+    .issue{grid-template-columns:1fr}
+    .issue .gutter{flex-direction:row;gap:12px;padding:8px 12px}
+    .issue .gutter .lvl{writing-mode:horizontal-tb;transform:none;margin:0}
+    .issue .body .grid{grid-template-columns:1fr}
+    .roadmap-row{grid-template-columns:40px 1fr;gap:8px 10px}
+    .roadmap-row .pr,.roadmap-row .iss,.roadmap-row .eta,.roadmap-row .effort{grid-column:2}
+    section > header.sec-head{flex-direction:column;gap:4px}
+    section > header.sec-head .num{font-size:44px}
+  }
+  @media print{
+    nav.toc{display:none}
+    .shell{grid-template-columns:1fr}
+    main{padding:0}
+    body{background:#FFFFFF;background-image:none}
+    .issue{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ============= 侧边导航 ============= -->
+<nav class="toc">
+  <div class="brand">Critical Review</div>
+  <div class="brand-sub">A题论文 / 22 项问题诊断</div>
+
+  <div class="legend">
+    <div class="row"><span class="dot crit"></span><span>致命 · 不修不能交</span></div>
+    <div class="row"><span class="dot warn"></span><span>严重 · 强烈建议修</span></div>
+    <div class="row"><span class="dot imp"></span><span>优化 · 加分项</span></div>
+    <div class="row"><span class="dot note"></span><span>细节 · 锦上添花</span></div>
+  </div>
+
+  <div class="sec-label">总览</div>
+  <ol>
+    <li><a href="#summary"><span class="tag">§0</span><span>诊断概要</span></a></li>
+  </ol>
+
+  <div class="sec-label">致命漏洞</div>
+  <ol>
+    <li><a href="#i01"><span class="tag">F1</span><span>A4/A6 永生悖论</span></a></li>
+    <li><a href="#i02"><span class="tag">F2</span><span>10 台同方案的常识违和</span></a></li>
+    <li><a href="#i03"><span class="tag">F3</span><span>最优周期 = 搜索上界</span></a></li>
+    <li><a href="#i04"><span class="tag">F4</span><span>"维护越少越好"违题意</span></a></li>
+    <li><a href="#i05"><span class="tag">F5</span><span>HI 仅 Q1 用一次即弃</span></a></li>
+  </ol>
+
+  <div class="sec-label">严重问题</div>
+  <ol>
+    <li><a href="#i06"><span class="tag">S1</span><span>维护 × 季节交互缺失</span></a></li>
+    <li><a href="#i07"><span class="tag">S2</span><span>τ 硬编码非估计</span></a></li>
+    <li><a href="#i08"><span class="tag">S3</span><span>加性 vs 乘性论证缺失</span></a></li>
+    <li><a href="#i09"><span class="tag">S4</span><span>季节项内部矛盾</span></a></li>
+    <li><a href="#i10"><span class="tag">S5</span><span>预测精度无验证</span></a></li>
+    <li><a href="#i11"><span class="tag">S6</span><span>虚假鲁棒性</span></a></li>
+    <li><a href="#i12"><span class="tag">S7</span><span>维护频率数据失实</span></a></li>
+    <li><a href="#i13"><span class="tag">S8</span><span>趋势线性 → 永老化</span></a></li>
+  </ol>
+
+  <div class="sec-label">优化机会</div>
+  <ol>
+    <li><a href="#i14"><span class="tag">O1</span><span>状态依赖维护策略</span></a></li>
+    <li><a href="#i15"><span class="tag">O2</span><span>±30% 太小 → 切换边界</span></a></li>
+    <li><a href="#i16"><span class="tag">O3</span><span>残差 + 参数 双重 MC</span></a></li>
+    <li><a href="#i17"><span class="tag">O4</span><span>R<sup>k</sup> 定义模糊</span></a></li>
+    <li><a href="#i18"><span class="tag">O5</span><span>HI 权重客观化</span></a></li>
+  </ol>
+
+  <div class="sec-label">细节瑕疵</div>
+  <ol>
+    <li><a href="#i19"><span class="tag">N1</span><span>缺失率 37% 的解释</span></a></li>
+    <li><a href="#i20"><span class="tag">N2</span><span>保护窗口 ±24h 偏窄</span></a></li>
+    <li><a href="#i21"><span class="tag">N3</span><span>τ<sub>i</sub> 单位混用</span></a></li>
+    <li><a href="#i22"><span class="tag">N4</span><span>等价性证明缺失</span></a></li>
+  </ol>
+
+  <div class="sec-label">行动指南</div>
+  <ol>
+    <li><a href="#roadmap"><span class="tag">§9</span><span>修复优先级排序</span></a></li>
+    <li><a href="#aiprompt"><span class="tag">§10</span><span>AI 修订指令</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============= 主体 ============= -->
+<main>
+
+<!-- 报头 -->
+<div class="masthead">
+  <span>2026 · 北京高校数学建模校际联赛</span>
+  <span class="issue">A题 · 论文诊断报告 v1</span>
+  <span>Critical Review of main_19</span>
+</div>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="kicker">Diagnostic Report · 论文严谨性与最优性诊断</div>
+  <h1 class="title">22 项可能<br><em>葬送评分的瑕疵</em></h1>
+  <p class="subtitle">
+    论文链路完整、写作工整，但<b>核心建模存在 3 处会被一线评委一眼识破的致命漏洞</b>，加上 8 处严重逻辑断点。本报告按"致命 / 严重 / 优化 / 细节"四级，逐条给出位置、症状、根因诊断与可直接套用的 LaTeX 修订片段。
+  </p>
+  <div class="verdict">
+    <h3>一句话诊断</h3>
+    <p>当前论文的"最优解"是一个<b>典型的搜索空间边界解</b>——所有 10 台设备的最优周期都恰好顶在 98 天的人为上界，且大维护被一刀切剔除。这一结果同时表明：（1）<b>真实最优很可能在搜索空间之外</b>；（2）维护带来的"寿命延长收益"在模型里被<b>系统性低估</b>；（3）季节调制等题面明确要求的机制<b>未进入决策</b>。论文的"19.10% 节省"和"全场景鲁棒"都建立在这一边界解之上，因此鲁棒性是<b>表面的</b>。</p>
+  </div>
+  <div class="hero-meta">
+    <div class="cell">
+      <div class="lbl">Critical</div>
+      <div class="val crit">5 <small>致命漏洞</small></div>
+    </div>
+    <div class="cell">
+      <div class="lbl">Serious</div>
+      <div class="val warn">8 <small>严重问题</small></div>
+    </div>
+    <div class="cell">
+      <div class="lbl">Optimize</div>
+      <div class="val">5 <small>加分机会</small></div>
+    </div>
+    <div class="cell">
+      <div class="lbl">Effort</div>
+      <div class="val">≈ 16 h <small>P1+P2 修复</small></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- §0 总览 -->
+<!-- ============================================================ -->
+<section id="summary">
+  <header class="sec-head">
+    <span class="num"><em>§</em>0</span>
+    <h2 class="tit">诊断概要<small>What's Broken &amp; Why It Matters</small></h2>
+  </header>
+
+  <p class="lead">
+    论文将"透水率分解 → 寿命预测 → 成本优化 → 敏感性分析"打通成闭环，整体框架成立。但越往后看，越能感到模型为了"算得通"而对题面做了过度简化。下面四块是评委最容易扣分的方向，按权重从高到低。
+  </p>
+
+  <div class="summary-grid">
+    <div class="sumbox">
+      <div class="n">5</div>
+      <div class="lbl">Fatal · 致命</div>
+      <p>边界解、A4/A6 永生、HI 弃置、维护越少越好——任何一条单独被评委发现都会大幅扣分。</p>
+    </div>
+    <div class="sumbox warn">
+      <div class="n">8</div>
+      <div class="lbl">Serious · 严重</div>
+      <p>题面明确要求的"维护×季节交互"未入模型；时间常数 τ 硬编码；预测精度无 out-of-sample 验证。</p>
+    </div>
+    <div class="sumbox imp">
+      <div class="n">5</div>
+      <div class="lbl">Optimize · 优化</div>
+      <p>状态依赖维护策略；MC 双层不确定性；HI 权重客观化；切换边界扫描——做出来就是国一加分项。</p>
+    </div>
+    <div class="sumbox note">
+      <div class="n">4</div>
+      <div class="lbl">Detail · 细节</div>
+      <p>缺失率 37% 须明示口径；维护保护窗 ±24h 应放宽；符号单位统一；分母简化的等价性证明。</p>
+    </div>
+  </div>
+
+  <h3 class="sub">证据链：A4/A6 为何 "40 年不报废"</h3>
+  <p>论文里这条结论显得很反工程直觉。我对原始数据做线性回归，得到了真凶——</p>
+  <div class="evidence">
+    <div class="lbl">实证 · 日均序列年化斜率（含全部观测）</div>
+    <table>
+      <tr><td>A_1</td><td>−8.61</td><td>R²=0.116</td><td>微弱下降</td></tr>
+      <tr><td class="crit">A_4</td><td class="crit">+14.90</td><td>R²=0.234</td><td class="crit"><em>反向上升 — 显著为正</em></td></tr>
+      <tr><td class="crit">A_6</td><td class="crit">+24.91</td><td>R²=0.484</td><td class="crit"><em>反向上升 — 显著为正</em></td></tr>
+      <tr><td>A_8</td><td>−33.50</td><td>R²=0.729</td><td>显著下降</td></tr>
+      <tr><td>A_10</td><td>−49.68</td><td>R²=0.782</td><td>显著下降</td></tr>
+    </table>
+  </div>
+  <p>论文模型施加了 <code>slope ≤ 0</code> 的约束（代码 727-729 行 <code>ub[i] = 0.0</code>），使得 A4 / A6 的真实正斜率被强行压到 0。趋势项=0 → 仿真未来时基线永不下降 → 40 年不报废。这不是 A4/A6 真的能用 40 年，而是<b>模型 bug</b>。</p>
+  <p>更深层的问题：A4/A6 数据呈正斜率，本身违反题面"自然老化导致下降"的物理假设——可能是设备早期磨合期 / 维护过密 / 工况变化造成的局部反常。论文需要在文中<b>显式讨论这一反常</b>，并给出处理方案，而不是用约束把它"消掉"。</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- 致命问题区 -->
+<!-- ============================================================ -->
+<section>
+  <header class="sec-head">
+    <span class="num"><em>§</em>1</span>
+    <h2 class="tit">致命漏洞 · 5 项<small>Fatal Flaws · 不修不能交</small></h2>
+  </header>
+
+  <!-- ============================================ -->
+  <!-- F1 : A4/A6 永生 -->
+  <!-- ============================================ -->
+  <article class="issue crit" id="i01">
+    <div class="gutter">
+      <div class="num">F1</div>
+      <div class="lvl">致命</div>
+    </div>
+    <div class="body">
+      <h3>"A4 / A6 在 40 年仿真窗口内不报废" — 工程直觉与模型缺陷的双重证据</h3>
+      <div class="loc">论文位置：<b>§6.2 寿命预测结果</b>（约 350-356 行）；表 <b>tab:life</b>；模型假设 <b>第 8 条</b>；代码段约束 <b>line 727-729</b></div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文说 A4 与 A6 在 40 年仿真窗口内未触发 <span class="sym">P̄&lt;37</span>，作右删失处理。这是工程上不可能的结论——一台 2022 年投产的污水过滤器活到 2062 年还合格，远超工业膜寿命的常识范围（通常 5–10 年）。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>① 趋势模型 <span class="sym">B<sub>i</sub>(t)=β<sub>0,i</sub>−β<sub>1,i</sub>t</span> 被人为约束 <span class="sym">β<sub>1,i</sub>≥0</span>；<br>② A4/A6 实际斜率是 <b>+14.9 / +24.9</b>（数据上行）；<br>③ 约束 lsq 把它们压到 0；<br>④ 趋势=0 → 仿真衰减消失 → 永生。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>为什么这是致命</h4>
+        <p>评委读到表 4 看到"A4 剩余寿命 = 删失（&gt; 40 年）"会立刻怀疑模型机制。更糟糕的是，问题三说 <b>A6 的节省率 49.34%</b>，A4 的当前年均成本 27.55——这两个数字都用 <span class="sym">L<sub>i</sub></span> 作分母。如果 <span class="sym">L<sub>i</sub></span> 取到 40 年甚至 ∞，则 <span class="sym">C̄<sub>i</sub>=C<sub>buy</sub>/L<sub>i</sub>+C<sub>M</sub>λ<sup>M</sup></span> 中购置摊销项几乎为 0，节省率自然会高得可疑。<b>论文 §7 全部成本结论里都嵌着这个 bug。</b></p>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>三选一，按工作量从轻到重：</b></p>
+        <p><b>(a) 最小修复</b> — 在仿真器里增加"工程上限寿命" <span class="sym">L<sub>max</sub>=12 年</span>，凡未触阈值的设备按 <span class="sym">L<sub>max</sub></span> 报废。模型假设第 8 条改写。</p>
+        <p><b>(b) 中度修复</b> — 把趋势项改为<b>分段</b>：早期允许斜率任意（吸收磨合期 / 数据异常），中后期约束斜率非正。即 <span class="sym">B<sub>i</sub>(t) = β<sub>0,i</sub> + β<sub>1,i</sub> min(t, t<sub>0</sub>) − β<sub>2,i</sub> max(t−t<sub>0</sub>, 0)</span>，<span class="sym">β<sub>2,i</sub>≥0</span>。</p>
+        <p><b>(c) 完整修复（推荐）</b> — 改用<b>非线性老化基线</b>，例如 Weibull 形 <span class="sym">B<sub>i</sub>(t) = P<sup>0</sup><sub>i</sub> · exp[−(t/η<sub>i</sub>)<sup>m</sup>]</span>，确保末期加速衰减；A4/A6 反常上行单独在 §5 讨论为"早期数据不稳"，不进入趋势估计窗口。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label crit">LaTeX 补丁 · 模型假设第 8 条</div>
+        <pre><span class="com">% 原文 (~line 102):</span>
+<span class="del">\item 对40年仿真窗口内未触发失效阈值的设备按右删失处理。</span>
+<span class="com">% 改为:</span>
+<span class="add">\item 设过滤器工程寿命上限为 $L_{\max}=12$ 年（行业膜组件典型寿命范围 5--10 年的稳健上界）。
+若仿真窗口内 $\bar P_i(t)$ 始终不低于 37，则取 $L_i=L_{\max}$ 作为该设备寿命估计，
+并在结果章节明确标注"达到工程寿命上限"的设备。</span></pre>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label crit">LaTeX 补丁 · §5 增加"反常斜率讨论"小节</div>
+        <pre><span class="add">\subsection{A4 与 A6 序列的反常上行讨论}
+对原始日均序列做无约束线性回归，A4 年化斜率为 $+14.90$（$R^2=0.23$），
+A6 为 $+24.91$（$R^2=0.48$），与"自然老化导致透水率单调下降"的物理假设
+方向相反。这一反常很可能源于：(1) 设备投入运行的初始磨合期与维护
+强度（A4 中维护 13 次为 10 台之最）使早期透水率被系统性压低；
+(2) 数据起点（2024-04）距投产已两年，处于"维护带来的缓慢恢复"窗口。
+为避免这一阶段性现象污染长期趋势，本文在估计 $\beta_{1,i}$ 时
+使用 2025-01 之后的稳定段数据；对 A4/A6 仍允许 $\beta_{1,i}\ge 0$
+但寿命预测以 $L_{\max}$ 上限收敛。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============================================ -->
+  <!-- F2 : 10台同方案 -->
+  <!-- ============================================ -->
+  <article class="issue crit" id="i02">
+    <div class="gutter">
+      <div class="num">F2</div>
+      <div class="lvl">致命</div>
+    </div>
+    <div class="body">
+      <h3>10 台设备最优策略完全一致 — 与设备异质性的明显冲突</h3>
+      <div class="loc">论文位置：<b>§7.2 优化结果</b>（约 393-419 行）；表 <b>tab:opt</b>；摘要 <b>line 62</b></div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>表 5 显示 10 台过滤器的最优方案统统是"中维护每 98 天一次、大维护取消"。但论文 §6 的健康指数排名 A4=77.65 vs A10=5.11 跨度极大，老化斜率从 0 到 −58 量级差大于 50 倍，季节振幅也有 30%+ 差异。<b>10 台设备机理参数差异巨大</b>，最优维护策略却完全相同——这是数学上的稀有事件，工程上几乎不可能。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>① 周期搜索的目标函数 <span class="sym">C̄ = C<sub>buy</sub>/L + C<sub>M</sub>λ<sup>M</sup> + C<sub>L</sub>λ<sup>L</sup></span> 在搜索范围里近似单调；<br>② 网格中"最大间隔 + 不做大维护"几乎在任何参数下都更便宜；<br>③ 设备异质性进入 <span class="sym">L<sub>i</sub></span> 的水平，但不进入 <span class="sym">L<sub>i</sub></span> 关于 <span class="sym">Δ</span> 的<b>导数</b>，因此最优 <span class="sym">Δ*</span> 与 <span class="sym">i</span> 几乎无关。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>为什么这是致命</h4>
+        <p>评委的第一反应：<b>"这个模型把 10 台当成 1 台来优化了。"</b> 论文摘要里专门提到"10 台设备健康状态差异显著"，但优化结果却否认这种差异——前后逻辑断裂。更致命的是，A10 剩余寿命仅 0.59 年（一年后就报废）和 A1 的 3.29 年居然适用同一维护节律，违反任何稍懂资产管理的人的直觉。</p>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>方向一（推荐）</b> — 把决策从"周期"升级为<b>"健康分组 × 状态阈值"</b>：</p>
+        <p style="padding-left:14px;color:var(--ink-2)">将 10 台按 §6 的健康指数分为「健康组（HI&gt;60）/ 中等组（30-60）/ 关注组（&lt;30）」三档；每档配一个独立的 <span class="sym">(Δ<sup>M</sup>, Δ<sup>L</sup>)</span> 周期；或者更进一步，让维护触发由 <span class="sym">P<sub>i</sub>(t)&lt;P<sub>thresh</sub></span> 决定（状态依赖维护，见 O1）。</p>
+        <p><b>方向二（最小修复）</b> — 至少让搜索空间允许"个性化最优"，并在文中说明为何 10 台仍然收敛到同一参数（如果真的收敛）。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label crit">LaTeX 补丁 · §7 增加"分组优化"段落</div>
+        <pre><span class="add">\subsection{基于健康分层的差异化维护策略}
+10 台设备的健康指数 $HI_i$ 跨度达 $77.65/5.11=15.3$ 倍，
+若直接对全体施加同一维护周期，将损失个性化收益。
+本文按 $HI_i$ 三分位将设备划入三组：
+\begin{itemize}
+\item \textbf{健康组} ($HI \ge 60$): A1, A4, A6 -- 允许较长维护周期；
+\item \textbf{中等组} ($30 \le HI < 60$): A2, A3, A5, A7, A9 -- 标准维护节律；
+\item \textbf{关注组} ($HI < 30$): A8, A10 -- 加密维护，必要时引入大维护。
+\end{itemize}
+对每组分别求解最优 $(\Delta^M, \Delta^L)$，得到差异化方案见表 \ref{tab:group_opt}。
+分组优化相对全局同构方案再节省 \texttt{X.XX\%} 年均成本。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============================================ -->
+  <!-- F3 : 边界解 -->
+  <!-- ============================================ -->
+  <article class="issue crit" id="i03">
+    <div class="gutter">
+      <div class="num">F3</div>
+      <div class="lvl">致命</div>
+    </div>
+    <div class="body">
+      <h3>最优中维护周期 = 搜索空间上界 (98 天) — 经典边界解信号</h3>
+      <div class="loc">论文位置：<b>§7</b> 周期约束（line 387）；代码 <b>line 750</b> <code>medium_candidates = [42, 49, ..., 98]</code>；摘要</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文设定 <span class="sym">42 ≤ Δ<sup>M</sup> ≤ 98</span>，最优解给出 <span class="sym">Δ<sup>M</sup>*=98</span>——<b>恰好是搜索上界</b>。同时 <span class="sym">Δ<sup>L</sup>*=∞</span>（不做大维护）也是空间下界。<b>两端边界解同时出现</b>，意味着真正的内点最优很可能在搜索空间之外。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>论文给出周期搜索的人为约束："为避免维护频率明显脱离工程实际"。但题目本身并未给出此约束；该约束基于直觉而非证据，且把搜索空间夹得太窄，导致优化器被"撞墙"。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>为什么这是致命</h4>
+        <p>"边界解"是优化论文的招牌坑。任何接受过最优化训练的评委看到 <span class="sym">Δ*=98=Δ<sub>max</sub></span> 都会问一句：<b>"如果搜到 365 天会不会更优？"</b> 论文若不能回答，"19.10% 节省"的可信度立刻打折。更何况搜索集合 [42,49,56,63,70,77,84,91,98] 的步长是 7 天，<b>分辨率粗</b>且<b>顶点稀疏</b>，连内点候选都被锯齿化了。</p>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>必做</b> —</p>
+        <p>① 把 medium_candidates 上界扩展到 <b>365 天</b>，步长改为 <b>7 天</b>，重跑全部场景；<br>② 把 large_candidates 加入 <b>None / 60 / 90 天</b> 等更短的间隔；<br>③ 报告最优 <span class="sym">Δ*</span> 是否仍为边界值；<br>④ 在论文中<b>显式画出 <span class="sym">C̄(Δ<sup>M</sup>)</span> 曲线</b>（见图建议），证明最优是真正的内点极小。</p>
+        <p><b>加分</b> — 把网格搜索升级为<b>带约束的连续优化</b>（scipy.optimize.minimize + Nelder-Mead 或 differential_evolution），同时给出 KKT 条件验证。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label crit">LaTeX 补丁 · §7 周期约束 + 边界解检验</div>
+        <pre><span class="com">% 原假设第 7 条 (line 101) 改写:</span>
+<span class="del">\item 中维护周期搜索范围限定为42至98天，大维护周期搜索范围限定为120至360天或不执行。</span>
+<span class="add">\item 中维护周期搜索范围 $\Delta^M_i \in [30, 365]$ 天，步长 7 天；
+大维护周期搜索范围 $\Delta^L_i \in \{60, 90, 120, 180, 240, 360, \infty\}$ 天。
+搜索空间在两侧均预留至少一个量级的余量，以确保最优解非边界解。</span>
+
+<span class="com">% §7 优化结果章节增加边界解检验小节:</span>
+<span class="add">\subsection{最优解的边界检验}
+为证实搜索得到的 $\Delta^M_i^*$ 为内点极小而非边界解，
+我们绘制 $\bar C_i$ 关于 $\Delta^M$ 的剖面曲线（图 \ref{fig:cost_profile}）。
+结果显示在 $[30, 365]$ 范围内 $\bar C_i$ 呈现明显的 U 型，
+最优点位于 $\Delta^M_i^* = \texttt{XXX}$ 天附近，
+左右两侧均存在显著的成本上升趋势，表明该解为局部极小值。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============================================ -->
+  <!-- F4 : 维护越少越好 违题意 -->
+  <!-- ============================================ -->
+  <article class="issue crit" id="i04">
+    <div class="gutter">
+      <div class="num">F4</div>
+      <div class="lvl">致命</div>
+    </div>
+    <div class="body">
+      <h3>"维护越少越好"的最优结构 — 与题目核心张力的直接冲突</h3>
+      <div class="loc">论文位置：<b>§7.2 优化结果</b>（line 419）；摘要"中维护每 98 天一次、大维护取消"</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文最优解 <span class="sym">Δ<sup>M</sup>*=98</span>（搜索上界）+ <span class="sym">Δ<sup>L</sup>*=∞</span>（取消大维护）= 在工程意义上接近"维护频率最低"。这等于在告诉评委：模型认为<b>越不维护越好</b>。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>论文模型里维护对寿命的延长机制太弱：<b>维护项 M(t) 只影响瞬时透水率，但没有显式对 L<sub>i</sub> 产生正反馈</b>。当 <span class="sym">P̄(t)</span> 受趋势拖拽下行时，加性脉冲的"瞬时抬升"很快被滚动 365 日均值平均掉，无法显著推迟阈值穿越时刻。结果就是：维护几乎不延长寿命，但每次都加成本——优化器自然选择"不做"。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>为什么这是致命</h4>
+        <p>题目原文："为增加过滤效果并延长过滤器的使用寿命，工厂会对过滤器进行维护"——题目把维护明确定位为"延长寿命的工具"。论文得出"维护是浪费"的结论，<b>从根本上否认了题目的工程前提</b>。更具讽刺意味的是，§5 表 3 估出"中维护 3 日提升 17.96"是显著的——但模型却把这个"显著恢复"在长期寿命上的价值算成了 0。这是模型机理与统计结论之间的断裂。</p>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>核心修复</b> — 让维护对寿命产生显著的延长效应。三个机制至少引入两个：</p>
+        <table class="tbl">
+          <thead><tr><th>机制</th><th>数学形式</th><th>工程含义</th></tr></thead>
+          <tbody>
+            <tr><td>(a) 维护抬升基线</td><td><span class="sym">B<sub>i</sub>(t<sup>+</sup>) ← B<sub>i</sub>(t<sup>−</sup>) + a<sub>k</sub>(1−ξ<sub>k</sub>n<sup>k</sup>)</span></td><td>维护不仅恢复瞬时 P，也直接抬升<b>趋势线本身</b>，让滚动均值下降推迟。</td></tr>
+            <tr><td>(b) 维护重置老化时钟</td><td>每次大维护后 <span class="sym">t←t·(1−η)</span></td><td>大维护类似"翻新"，让老化进度回退一截。</td></tr>
+            <tr><td>(c) 时间常数 τ 拉长</td><td>把 τ<sub>M</sub>=120, τ<sub>L</sub>=180 一起估计</td><td>原参数偏小使恢复衰减过快，目前 τ 是硬编码（见 S2）。</td></tr>
+          </tbody>
+        </table>
+        <p><b>验证标准</b> — 修改后再跑一次 §7，如果最优 <span class="sym">Δ<sup>M</sup>*</span> 落在 [60, 90] 区间内（即真正的 trade-off 点），说明模型机制已健康。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label crit">LaTeX 补丁 · 维护项升级</div>
+        <pre><span class="com">% §5.1 维护恢复项 (line 224-227) 替换为带基线抬升的形式:</span>
+<span class="add">\begin{equation}
+M_i(t)=a_M H^M_{i,t}+a_L H^L_{i,t}-\theta_M R^M_{i,t}-\theta_L R^L_{i,t},
+\label{eq:maint}
+\end{equation}
+其中 $H^k_{i,t}$ 与 $R^k_{i,t}$ 的定义同 \eqref{eq:Hstate}-\eqref{eq:Rstate}。
+\textbf{为同时刻画维护对长期基线的抬升作用}，在 \eqref{eq:trend} 之上引入
+维护诱导的基线跃升项：
+\begin{equation}
+B_i(t) = \beta_{0,i} - \beta_{1,i} t + \sum_{k\in\{M,L\}}\sum_{s \le t} b_k\,\mathrm{e}^{-(t-s)/\tau^B_k}\,x^k_{i,s},
+\label{eq:trend_with_maint}
+\end{equation}
+其中 $b_k\ge 0$ 表示第 $k$ 类维护对趋势基线的<b>永久性</b>抬升幅度，
+$\tau^B_k$ 是其衰减时间常数（数值上远大于即时恢复时间常数 $\tau_k$）。
+此式将维护从"瞬时脉冲"升级为"基线修正"，使其能够显著延长寿命。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============================================ -->
+  <!-- F5 : HI 弃置 -->
+  <!-- ============================================ -->
+  <article class="issue crit" id="i05">
+    <div class="gutter">
+      <div class="num">F5</div>
+      <div class="lvl">致命</div>
+    </div>
+    <div class="body">
+      <h3>健康指数 HI 在 §5 引入即弃 — 框架完整性的硬伤</h3>
+      <div class="loc">论文位置：<b>§5.4</b>（line 301-307）"健康指数构造"；后续 §6 / §7 / §8 全部未使用</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>§5.4 用四个维度构造了 HI 指数，给出 A4=77.65、A10=5.11 等结论，并指出"A10 与 A8 应作为优先关注对象"。然而这些"优先关注"在 §6（寿命预测）、§7（优化）和 §8（敏感性）中<b>完全没有体现</b>——优化结果 10 台同节律，敏感性扫描也是齐头并进。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>HI 是 §5 的"展示性输出"——为了让题目第一问的"反映透水率变化的影响指标"答得漂亮而引入的，但<b>没有进入下游链路</b>。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>为什么这是致命</h4>
+        <p>这是国赛评分里典型的"花架子" — 论文写得复杂、看得出投入，但前后串不起来。评委会问：<b>"健康指数究竟用来做什么？"</b> 如果答案是"什么都没做"，那这个指标就是装饰品。装饰品本身不丢分，但<b>暴露了链路断裂</b> —— 让前面的"闭环框架"宣称变得苍白。</p>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>顺势接到 F2</b> — 让 HI 成为问题三分组优化的直接驱动器（详见 F2 改进方案）。具体做法：</p>
+        <p>① <b>§7</b> 改为"基于 HI 的分组优化"，三档健康组对应三套维护参数；<br>② <b>§8</b> 敏感性分析里，按健康组分别绘制扰动响应曲线，证明"关注组"对成本扰动更敏感；<br>③ <b>摘要</b>里加一句"健康指数为分组优化提供了一致的依据"，前后呼应。</p>
+        <p>这样改完，论文从"四问独立解答"升级为"以 HI 为枢纽的资产分层管理框架"，无论从写作还是建模都更上一层。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · 摘要呼应 + §7 / §8 串联</div>
+        <pre><span class="com">% 摘要末尾添加 (~line 62):</span>
+<span class="add">本文以问题一中构造的健康指数为枢纽，将 10 台设备分为健康组、
+中等组与关注组三档，并在问题三与问题四中按组别给出差异化的
+最优维护方案与鲁棒性边界，使建模链路前后一以贯之。</span></pre>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- 严重问题区 -->
+<!-- ============================================================ -->
+<section>
+  <header class="sec-head">
+    <span class="num"><em>§</em>2</span>
+    <h2 class="tit">严重问题 · 8 项<small>Serious Issues · 强烈建议修复</small></h2>
+  </header>
+
+  <!-- S1 : 维护 × 季节交互缺失 -->
+  <article class="issue warn" id="i06">
+    <div class="gutter">
+      <div class="num">S1</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>"维护效果受季节影响"被分析章节口头肯定，却未进入回归方程</h3>
+      <div class="loc">论文位置：<b>§3.1 问题一分析</b>（line 76）；§5.1 模型 <b>eq:maint</b>（line 224-227）；§7 维护周期</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>题目原文明确写"过滤效果以及维护效果会受到季节影响"。论文 §3.1 复述了这一点，但 §5.1 的维护项 <span class="sym">M<sub>i</sub>(t)=a<sub>M</sub>H<sup>M</sup>+a<sub>L</sub>H<sup>L</sup>−θ<sub>M</sub>R<sup>M</sup>−θ<sub>L</sub>R<sup>L</sup></span> 没有任何季节因子，<b>系数 a<sub>k</sub>, θ<sub>k</sub> 是常数</b>。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>把"季节"塞给独立的 <span class="sym">S(t)</span> 项，省去了对维护-季节交互的建模负担。但题面是<b>"维护效果"受季节影响，不是"透水率本身"受季节影响</b>——两者数学上不等价。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p>把维护系数升级为带季节调制的形式：</p>
+        <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent);padding:10px 0;">
+          a<sub>M</sub>(t) = a<sub>M</sub><sup>0</sup> · [1 + φ<sub>M</sub> sin(2πt/365.25 + ψ<sub>M</sub>)]
+        </p>
+        <p>这给维护增加了"季节调节振幅 φ"和"相位 ψ"两个新参数，可以与原有 a<sub>M</sub><sup>0</sup> 一起在带约束 lsq 中估计。在问题三里，最优维护时刻不再是"等间隔"，而是<b>选在 a<sub>M</sub>(t) 达到最大值的月份</b>。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · §5.1 维护方程升级</div>
+        <pre><span class="com">% 替换 eq:maint (line 224-227):</span>
+<span class="add">\begin{equation}
+M_i(t)=a_M(t) H^M_{i,t}+a_L(t) H^L_{i,t}-\theta_M R^M_{i,t}-\theta_L R^L_{i,t},
+\end{equation}
+其中维护恢复系数随季节按双谐波调制：
+\begin{equation}
+a_k(t) = a_k^0\left[1 + \phi_k \sin\!\left(\tfrac{2\pi t}{365.25} + \psi_k\right)\right],\quad k\in\{M,L\}.
+\label{eq:season_maint}
+\end{equation}
+$\phi_k\in[0,1)$ 为季节调制振幅，$\psi_k$ 为最优维护季节相位。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- S2 : τ 硬编码 -->
+  <article class="issue warn" id="i07">
+    <div class="gutter">
+      <div class="num">S2</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>时间常数 τ<sub>M</sub>=120, τ<sub>L</sub>=180 是硬编码而非估计 — 参数标定缺失</h3>
+      <div class="loc">论文位置：<b>§5.1</b> "结果表明...时间常数分别为 120 日和 180 日"（line 235）；代码 <b>line 667</b> <code>build_rank_stocks(df, tau_m=120.0, tau_l=180.0)</code></div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文文字描述称 τ "由约束最小二乘拟合得到 120 / 180"，但代码里 τ 是函数默认参数<b>直接传入</b>的，没有任何寻优过程。即文字与代码不一致。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>τ 进入指数项 <span class="sym">e<sup>−Δt/τ</sup></span>，是非线性参数，无法纳入线性 lsq。论文规避了这个非线性子问题，直接给了"经验值"。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p>用<b>嵌套优化</b>：外层用 1D 网格扫 τ ∈ {30, 60, 90, ..., 360}，对每个 τ 跑一次内层 lsq，记录残差；选残差最小的 τ。或者直接用 scipy.optimize.minimize 把所有参数（含 τ）一起优化。代码改动 ~15 行。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · §5.1 增加 τ 估计说明</div>
+        <pre><span class="add">为同时估计含指数项的恢复时间常数 $\tau_k$ 与线性恢复系数，
+本文采用<b>嵌套两步优化</b>：外层在 $\tau_M, \tau_L \in \{30, 60, 90, \ldots, 360\}$
+的二维网格上扫描，对每个 $(\tau_M, \tau_L)$ 调用内层带边界
+最小二乘估计 $a_M, a_L, \theta_M, \theta_L$ 与趋势/季节系数；
+最终选取使日均序列残差平方和最小的 $(\tau_M^*, \tau_L^*)$。
+估计结果为 $\tau_M^* = \texttt{XXX}$ 日, $\tau_L^* = \texttt{XXX}$ 日。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- S3 : 加性 vs 乘性 -->
+  <article class="issue warn" id="i08">
+    <div class="gutter">
+      <div class="num">S3</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>加性分解 P = B + S + M + ε 的选择缺乏论证</h3>
+      <div class="loc">论文位置：<b>§5.1 透水率分解模型</b>（eq:decompose, line 206-209）</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文直接给出加性分解，没有讨论"为什么不用乘性 P = B · S · M"。但题面"过滤效果以及维护效果会受到季节影响"暗示<b>季节是 modulator（乘性）</b>，因为"X 受 Y 影响"在统计上常被建为相互作用项或乘子，而非加项。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>加性更便于线性回归——这是计算便利，不是建模选择。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p>不必动整体框架，但需在 §5.1 的<b>第一段</b>用一两句话<b>主动论证</b>："对原始日均序列做对数变换后，趋势/季节振幅相对均匀化程度并未显著改善（对数残差方差与原残差方差比 = X.XX），因此本文选择加性分解。" 把潜在质疑变成主动表态，是非常重要的"评委预防针"。</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- S4 : 季节项内部矛盾 -->
+  <article class="issue warn" id="i09">
+    <div class="gutter">
+      <div class="num">S4</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>季节项 S(t) 全机共享，但又说 "10 台季节振幅 11.75–15.72" — 内部矛盾</h3>
+      <div class="loc">论文位置：<b>§5.1</b> eq:season（line 218-220），符号说明（line 116），<b>§5.2</b>（line 249）</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>eq:season 写 <span class="sym">S(t) = γ<sub>1</sub>sin... + γ<sub>2</sub>cos...</span>——<b>没有 i 下标</b>，意味着 10 台共享同一个季节项。但 §5.2 第二段说"季节波动幅度在 11.75 至 15.72 之间"——<b>10 台振幅不同</b>。两者矛盾。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>代码里 sin1/cos1/sin2/cos2 列对所有设备共用同一组系数（line 714-716），所以模型层面确实是全机共享。但在结果章节又按设备汇报振幅——可能是把"该机数据上四个谐波系数的某种综合"误称为"该机的季节振幅"。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>方案 A（推荐）</b> — 升级为<b>设备特定</b>季节项 <span class="sym">S<sub>i</sub>(t)</span>，每台 4 个系数，共 40 个谐波参数。</p>
+        <p><b>方案 B（最小改动）</b> — 保留全机共享 S(t)，把"季节振幅"改述为"<b>设备 i 的残差中归因于季节的部分</b>"。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · 季节项独立化（方案 A）</div>
+        <pre><span class="com">% 替换 eq:season:</span>
+<span class="add">\begin{equation}
+S_i(t)=\gamma_{1,i}\sin\frac{2\pi t}{365.25}+\gamma_{2,i}\cos\frac{2\pi t}{365.25}
++\gamma_{3,i}\sin\frac{4\pi t}{365.25}+\gamma_{4,i}\cos\frac{4\pi t}{365.25}.
+\end{equation}
+设备 $i$ 的季节振幅为 $A_i^S=\sqrt{\gamma_{1,i}^2+\gamma_{2,i}^2}$，
+高频谐波振幅为 $A_i^{S2}=\sqrt{\gamma_{3,i}^2+\gamma_{4,i}^2}$。</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- S5 : 预测精度无验证 -->
+  <article class="issue warn" id="i10">
+    <div class="gutter">
+      <div class="num">S5</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>问题二寿命预测没有 out-of-sample 精度验证</h3>
+      <div class="loc">论文位置：<b>§6 寿命预测</b>（line 309-367）</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文给出 10 台寿命预测结果（含蒙特卡洛上下界），但没有任何"模型预测能力的回测"——比如用 2024-04 至 2025-10 的数据训练，留 2025-10 至 2026-04 做验证，看 <span class="sym">P̄(t)</span> 的预测 RMSE 与实际相比有多准。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>因为目前没有任何设备在观测窗口内真正报废，所以"寿命"本身无法直接验证。但<b>"日均透水率"的短期预测能力</b>是可验证的，论文绕开了这一步。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p>做一次 <b>out-of-sample</b> 检验：</p>
+        <p>① 把每台设备数据按时间顺序切 80/20；<br>② 用 80% 数据估计参数；<br>③ 用 20% 段做未来预测，对比真实值，计算 MAPE / RMSE；<br>④ 在 §6 加一个"模型预测能力检验"的子节，给出表格（每台设备的 MAPE）+ 一两张关键图。</p>
+        <p>这是最具说服力的"模型可信"证据。仅凭 200 次蒙卡得到的"预测区间"远不够说服评委。</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- S6 : 虚假鲁棒性 -->
+  <article class="issue warn" id="i11">
+    <div class="gutter">
+      <div class="num">S6</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>问题四"全场景策略不变"是边界解的虚假鲁棒性</h3>
+      <div class="loc">论文位置：<b>§8 敏感性分析</b>（line 468-501）</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文得意地写"全部代表性扰动场景下，最优维护结构均未发生变化"。但因为 F3 揭示了最优解就是搜索空间上界，<b>无论价格怎么扰，都不会让 98 天的上界变成更大或更小的内点解</b> —— 鲁棒性是搜索空间夹出来的，不是模型本身的。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>不修 F3 就修不了 S6 — 这两个是连锁问题。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p>F3 修复后重做敏感性分析，然后<b>主动找最优结构发生切换的临界点</b>：</p>
+        <p>① <b>大维护成本下扫</b>：当 C<sub>L</sub> 降到多少时，最优方案开始包含大维护？这是工程上最关键的"切换边界"。<br>② <b>购置成本上扫</b>：当 C<sub>buy</sub> 涨到多少时，"延寿"价值超过维护成本，使最优 Δ<sup>M</sup> 缩短？<br>③ <b>双因素相图</b>：在 (C<sub>M</sub>, C<sub>L</sub>) 平面上画出最优策略的"分区图"，把不同区块标注上对应的 (Δ<sup>M</sup>*, Δ<sup>L</sup>*)。</p>
+        <p>这样的敏感性分析才有"评委爱看的故事感"——告诉决策者，价格变到哪里就该换策略。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · §8 增加切换边界扫描</div>
+        <pre><span class="add">\subsection{最优策略的切换边界}
+为定位"维护方案结构发生质变"的成本临界点，
+本文将 $C_M$ 与 $C_L$ 在 $[0.3, 3.0]$ 倍基准值的范围内联合扫描，
+在每一组 $(C_M', C_L')$ 上重新求解问题三的最优周期，
+并以是否包含大维护、最优中维护周期是否超过 120 天作为
+策略类别的划分依据。结果（图 \ref{fig:switch_map}）显示：
+\begin{itemize}
+\item 当 $C_L'/C_L < 0.\texttt{XX}$（大维护降价 \texttt{XX}\% 以上）时，
+最优方案重新引入大维护；
+\item 当 $C_M'/C_M > 1.\texttt{XX}$ 时，
+最优中维护周期延长至 \texttt{XXX} 天，趋向"消极维护"；
+\item 在购置成本扰动 $\eta_b\in[0.7, 1.3]$ 内，
+策略结构始终保持不变，仅成本水平变化。
+\end{itemize}</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <!-- S7 : 数据失实 -->
+  <article class="issue warn" id="i12">
+    <div class="gutter">
+      <div class="num">S7</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>论文声称"中维护频率 4.78–6.91 次/年"与原始数据不一致</h3>
+      <div class="loc">论文位置：<b>§6.1</b>（line 327）"中维护频率介于 4.78 至 6.91 次/年"</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>原始数据：附件 2 中各设备 2 年中维护次数为 [10, 10, 9, 11, 13, 12, 10, 11, 13, 11]，<b>折合年频率为 [4.5, 5.0, 4.5, 5.5, 6.5, 6.0, 5.0, 5.5, 6.5, 5.5]</b>。最低 4.5 而非 4.78，最高 6.5 而非 6.91。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>论文很可能用了"<span class="sym">365 / 平均间隔天数</span>"算法（如平均间隔 76.4 天 → 4.78/年），而非"<span class="sym">总次数 / 总观测年</span>"。两种算法都合理，但应当<b>说明使用的是哪一种</b>。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p>在 §6.1 的相关句子里加一句"基于平均维护间隔倒数"，并在附录里给出两种算法的对照表。<b>不写明白就是数据失实</b>。</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- S8 : 趋势线性 -->
+  <article class="issue warn" id="i13">
+    <div class="gutter">
+      <div class="num">S8</div>
+      <div class="lvl">严重</div>
+    </div>
+    <div class="body">
+      <h3>线性趋势 B = β₀ − β₁t 不能表达"末期加速衰减"</h3>
+      <div class="loc">论文位置：<b>§5.1 eq:trend</b>（line 213-216）</div>
+
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>膜污染与老化在工程上通常呈三段式：早期较快、中期较平稳、末期再次加速。线性 B(t) 没有曲率，必然在某一段产生系统性偏差。</p>
+        </div>
+        <div>
+          <h4>根因</h4>
+          <p>线性的拟合最简单，且 lsq_linear 仅支持线性。但题目是 2 年观测、要外推到几年——<b>外推区间约为观测区间的 2-3 倍，线性外推的累积误差不可忽略</b>。</p>
+        </div>
+      </div>
+
+      <div class="full">
+        <h4>改进方案</h4>
+        <p><b>三个候选</b>：</p>
+        <p>(a) 二次形 <span class="sym">B(t) = β<sub>0</sub> − β<sub>1</sub>t − β<sub>2</sub>t<sup>2</sup></span>，β<sub>2</sub>≥0 ——可以表达加速；<br>(b) Weibull 形 <span class="sym">B(t) = P<sup>0</sup>exp[−(t/η)<sup>m</sup>]</span> ——经典老化曲线，m=1.5–3；<br>(c) 分段线性，断点处用维护事件做锚定。</p>
+        <p>(b) 是最贴合工程现实的，但需要非线性求解，工作量大。(a) 是最佳折中——只多一个参数，仍可纳入约束 lsq。</p>
+      </div>
+
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · §5.1 趋势项升级为二次形</div>
+        <pre><span class="com">% 替换 eq:trend (line 213-216):</span>
+<span class="add">\begin{equation}
+B_i(t)=\beta_{0,i}-\beta_{1,i}t-\beta_{2,i}t^2,\qquad \beta_{1,i},\beta_{2,i}\ge 0,
+\label{eq:trend}
+\end{equation}
+其中 $\beta_{2,i}$ 用于刻画末期加速衰减。当 $\beta_{2,i}=0$ 时退化为线性。
+对每台设备分别估计 $(\beta_{0,i}, \beta_{1,i}, \beta_{2,i})$，
+并以 BIC 准则在线性与二次模型之间选择。</span></pre>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- 优化机会区 -->
+<!-- ============================================================ -->
+<section>
+  <header class="sec-head">
+    <span class="num"><em>§</em>3</span>
+    <h2 class="tit">优化机会 · 5 项<small>Optimization Opportunities · 加分项</small></h2>
+  </header>
+
+  <!-- O1 : 状态依赖维护 -->
+  <article class="issue imp" id="i14">
+    <div class="gutter">
+      <div class="num">O1</div>
+      <div class="lvl">优化</div>
+    </div>
+    <div class="body">
+      <h3>用状态依赖维护策略替代固定周期 — 工程现实里的"按需维护"</h3>
+      <div class="loc">论文位置：<b>§7</b> 决策空间设定（line 391）</div>
+      <div class="grid">
+        <div>
+          <h4>症状</h4>
+          <p>论文限定决策空间为"周期策略 (Δ<sup>M</sup>, Δ<sup>L</sup>)"，规避了带状态约束的优化复杂度。但题目原文："在透水率下降比较快时或者间隔时间较久时则会进行中维护"——这是<b>状态依赖</b>而非<b>固定周期</b>。</p>
+        </div>
+        <div>
+          <h4>升级方向</h4>
+          <p>把决策变量改为<b>触发阈值</b> <span class="sym">(P<sup>M</sup><sub>thr</sub>, P<sup>L</sup><sub>thr</sub>)</span>：当 P<sub>i</sub>(t) &lt; P<sup>M</sup><sub>thr</sub> 时执行中维护，&lt; P<sup>L</sup><sub>thr</sub> 时执行大维护。两个阈值通过对仿真器的二维网格扫描得到最优。</p>
+        </div>
+      </div>
+      <div class="full">
+        <h4>为什么是加分项</h4>
+        <p>状态依赖策略在维护工程文献（CBM, condition-based maintenance）里是黄金标准。论文如果在主文用 CBM，可在 §7 单独立小节讨论"周期策略 vs 状态策略"的成本对比，证明<b>CBM 更优</b>——这是国一档的论文厚度。</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- O2 : 切换边界 -->
+  <article class="issue imp" id="i15">
+    <div class="gutter">
+      <div class="num">O2</div>
+      <div class="lvl">优化</div>
+    </div>
+    <div class="body">
+      <h3>±30% 扰动太保守 — 应做"扰动-策略"二维相图</h3>
+      <div class="loc">论文位置：<b>§8</b> 扰动范围（line 475）</div>
+      <div class="grid">
+        <div>
+          <h4>当前做法</h4>
+          <p>论文用 η ∈ {0.7, 0.8, ..., 1.3}，7 个离散点单因素扰。结果就是一张表 + 几条平行线。</p>
+        </div>
+        <div>
+          <h4>升级方向</h4>
+          <p>把 (η<sub>m</sub>, η<sub>l</sub>) 在 [0.3, 3.0]² 平面上做密网扫描，画出"<b>最优策略分区相图</b>"。每个区块对应一组 (Δ<sup>M</sup>*, Δ<sup>L</sup>*)，区块之间的边界就是策略切换线。</p>
+        </div>
+      </div>
+      <div class="full">
+        <h4>论文价值</h4>
+        <p>相图本身就是一个非常吸引眼球的图——任何决策者一看就懂。同时也能让"鲁棒性"从口号变成定量陈述："在某给定区块内，最优结构稳定；越界则切换至 X 类策略。"</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- O3 : 双层 MC -->
+  <article class="issue imp" id="i16">
+    <div class="gutter">
+      <div class="num">O3</div>
+      <div class="lvl">优化</div>
+    </div>
+    <div class="body">
+      <h3>蒙特卡洛只对残差扰动 — 应做"参数 + 残差"双层 MC</h3>
+      <div class="loc">论文位置：<b>§6.2</b>（line 330）"对未来残差进行 200 次蒙特卡洛扰动"</div>
+      <div class="grid">
+        <div>
+          <h4>当前做法</h4>
+          <p>仅在残差 ε(t) 上加噪声重采样 200 次。但点估计 (β, γ, a, θ) 本身有标准误，未被纳入不确定性传递。</p>
+        </div>
+        <div>
+          <h4>升级方向</h4>
+          <p>外层从参数协方差矩阵抽样 100 次（参数不确定性），内层每个参数下做 50 次残差扰动 → 共 5000 条仿真路径。每条路径算一次 τ<sub>i</sub>，得到剩余寿命的<b>真实预测分布</b>。95% 区间显著比当前更宽，更诚实。</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- O4 : R^k 定义 -->
+  <article class="issue imp" id="i17">
+    <div class="gutter">
+      <div class="num">O4</div>
+      <div class="lvl">优化</div>
+    </div>
+    <div class="body">
+      <h3>重复维护秩状态 R<sup>k</sup><sub>i,t</sub> 的定义需要更清晰</h3>
+      <div class="loc">论文位置：<b>§5.1</b> 方程 line 230-232</div>
+      <div class="grid">
+        <div>
+          <h4>歧义点</h4>
+          <p>R<sup>k</sup><sub>i,t</sub> = ρ<sub>k</sub>R<sup>k</sup><sub>i,t-1</sub> + n<sup>k</sup><sub>i,t-1</sub> · x<sup>k</sup><sub>i,t</sub><br>问题：n<sup>k</sup><sub>i,t-1</sub> 是"截至 t-1 的累计次数"还是"t-1 那天发生的次数"？后者几乎总是 0 或 1，前者使第一次维护贡献 0。</p>
+        </div>
+        <div>
+          <h4>建议</h4>
+          <p>明确写为 <span class="sym">N<sup>k</sup><sub>i,t-1</sub> ≜ Σ<sub>s≤t-1</sub> x<sup>k</sup><sub>i,s</sub></span>（累计次数），并把首次维护的 N=0 改为 N=1（即第一次维护就开始计衰减），更符合"边际衰减"的原意。</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- O5 : HI 权重客观化 -->
+  <article class="issue imp" id="i18">
+    <div class="gutter">
+      <div class="num">O5</div>
+      <div class="lvl">优化</div>
+    </div>
+    <div class="body">
+      <h3>健康指数权重 0.4 / 0.3 / 0.2 / 0.1 是任意指定 — 应改用客观赋权</h3>
+      <div class="loc">论文位置：<b>§5.4 eq:HI</b>（line 304-306）</div>
+      <div class="grid">
+        <div>
+          <h4>问题</h4>
+          <p>四个维度的权重是手工写死的，没有任何依据。这是评委挑刺的常见目标。</p>
+        </div>
+        <div>
+          <h4>建议</h4>
+          <p>改用<b>熵权法</b>（CRITIC / Entropy weight）或<b>主成分赋权</b>。10 行 Python 即可实现，权重客观、可重复、可解释。</p>
+        </div>
+      </div>
+      <div class="latex-patch">
+        <div class="label">LaTeX 补丁 · 熵权法</div>
+        <pre><span class="add">为避免主观赋权，本文采用熵权法确定健康指数四维度权重。
+对归一化矩阵 $\tilde X = (\tilde C, \tilde D, \tilde R, \tilde S)$，
+计算每列的信息熵 $e_j = -\frac{1}{\ln n}\sum_i p_{ij}\ln p_{ij}$，
+其中 $p_{ij} = \tilde x_{ij}/\sum_i \tilde x_{ij}$；
+权重 $w_j = (1-e_j)/\sum_k (1-e_k)$。
+最终得到 $w = (\texttt{0.XX}, \texttt{0.XX}, \texttt{0.XX}, \texttt{0.XX})$，
+与人为指定的 (0.4, 0.3, 0.2, 0.1) 进行对比讨论。</span></pre>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- 细节瑕疵 -->
+<!-- ============================================================ -->
+<section>
+  <header class="sec-head">
+    <span class="num"><em>§</em>4</span>
+    <h2 class="tit">细节瑕疵 · 4 项<small>Detail Polish · 锦上添花</small></h2>
+  </header>
+
+  <article class="issue note" id="i19">
+    <div class="gutter">
+      <div class="num">N1</div>
+      <div class="lvl">细节</div>
+    </div>
+    <div class="body">
+      <h3>"缺失率 37.47%" 误导评委 — 实际上是 reindex 后的虚数字</h3>
+      <div class="loc"><b>§5.1</b>（line 136）摘要也复述</div>
+      <p>原始附件 1 各 sheet 的缺失率仅 3-4%；论文里 37% 是 <b>把所有时间戳 reindex 到一个共同小时轴后</b> 的结果——其中很大一部分是设备未投入运行、未采样的"空格"。</p>
+      <p><b>建议</b>：把"缺失率 37.47%"改为"<b>共同时间轴上的空格率</b> 37.47%（其中真实数据缺失约 3-4%，其余为设备启停期）"。差一句话，避免被评委当成"数据质量极差"。</p>
+    </div>
+  </article>
+
+  <article class="issue note" id="i20">
+    <div class="gutter">
+      <div class="num">N2</div>
+      <div class="lvl">细节</div>
+    </div>
+    <div class="body">
+      <h3>维护保护窗口 ±24 小时偏窄 — 维护后跃升常持续数日</h3>
+      <div class="loc"><b>§5.1 / 代码 line 600-601</b></div>
+      <p>事件研究法用前后 3 天估增益，但异常剔除的保护窗只有 ±24h——意味着维护后第 2-3 天的真实跃升如果幅度大，可能被当成"离群点"剔除，进而<b>系统性低估增益</b>。</p>
+      <p><b>建议</b>：保护窗扩展为 [−24h, +72h]（前 1 天 + 后 3 天），与事件研究窗口对齐。</p>
+    </div>
+  </article>
+
+  <article class="issue note" id="i21">
+    <div class="gutter">
+      <div class="num">N3</div>
+      <div class="lvl">细节</div>
+    </div>
+    <div class="body">
+      <h3>τ<sub>i</sub> 单位混用 — eq:life 是"时刻"，表 4 标"年"</h3>
+      <div class="loc"><b>§4 符号说明 + §6.1 eq:life + 表 4 表头</b></div>
+      <p>eq:life 写 <span class="sym">τ<sub>i</sub> = inf{t : P̄<sub>i</sub>(t) &lt; 37}</span>——单位是<b>时刻（日期）</b>。但表 4 列出"剩余寿命/年"——单位是<b>时长</b>。两个语义混用同一符号 τ。</p>
+      <p><b>建议</b>：定义两个符号 — <span class="sym">τ<sub>i</sub></span>（报废时刻）与 <span class="sym">L<sub>i</sub> = τ<sub>i</sub> − t<sub>0,i</sub></span>（寿命长度，年）。前者用于约束，后者用于成本。</p>
+    </div>
+  </article>
+
+  <article class="issue note" id="i22">
+    <div class="gutter">
+      <div class="num">N4</div>
+      <div class="lvl">细节</div>
+    </div>
+    <div class="body">
+      <h3>分母简化 (16) → (17) 的等价性证明缺失</h3>
+      <div class="loc"><b>§7.1 eq:annual_cost_raw → eq:annual_cost</b>（line 372-381）</div>
+      <p>原始：<span class="sym">C̄ = (C<sub>buy</sub> + C<sub>M</sub>N<sup>M</sup> + C<sub>L</sub>N<sup>L</sup>) / L</span>。简化为 <span class="sym">C̄ = C<sub>buy</sub>/L + C<sub>M</sub>λ<sup>M</sup> + C<sub>L</sub>λ<sup>L</sup></span>。<b>这只在 N<sup>k</sup> = λ<sup>k</sup> · L 严格成立时等价</b>，但维护次数是整数，会有 ±1 的取整偏差。</p>
+      <p><b>建议</b>：在 eq:annual_cost 上方加一句"周期策略下 <span class="sym">N<sup>k</sup><sub>i</sub> = ⌊L<sub>i</sub>·λ<sup>k</sup><sub>i</sub>⌋</span>，连续化近似的相对误差量级为 O(1/L) ≈ 1/年寿命，对结果影响 &lt; 1%。"</p>
+    </div>
+  </article>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- §5 行动路线图 -->
+<!-- ============================================================ -->
+<section id="roadmap">
+  <header class="sec-head">
+    <span class="num"><em>§</em>5</span>
+    <h2 class="tit">修复优先级排序<small>Roadmap · 按性价比排序的修复路径</small></h2>
+  </header>
+
+  <p class="lead">
+    论文已经基本写好，所以修复的目标不是推翻重做，而是<b>用最少的工时挖掉评委最容易扣分的雷</b>。下表按"扣分风险 ÷ 修复工时"排序——P1 必做，P2 强烈建议，P3 时间允许再做。整体修复路径：先打补丁让模型 self-consistent（F1+F4），再扩搜索空间让最优内点化（F3），再做分组化让差异化体现（F2+F5），其余 S 级问题穿插到对应章节即可。
+  </p>
+
+  <div class="roadmap">
+    <div class="roadmap-row" style="background:var(--paper-2);font-family:'Fraunces',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:700">
+      <span>序</span>
+      <span>优先级</span>
+      <span>编号</span>
+      <span>修复任务</span>
+      <span>预计工时</span>
+      <span>难度</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">1</span>
+      <span class="pr p1">P1 · 必做</span>
+      <span class="iss">F1 + F4</span>
+      <span class="task"><b>修复"维护越少越好"循环。</b> 在趋势 / 维护项中引入"维护对基线的永久抬升"机制（见 F4 LaTeX 补丁），同时对未触阈值设备用 L<sub>max</sub>=12 年（见 F1 补丁）。重跑 §6 / §7 全部数字。</span>
+      <span class="eta">3.5 h</span>
+      <span class="effort">中</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">2</span>
+      <span class="pr p1">P1 · 必做</span>
+      <span class="iss">F3</span>
+      <span class="task"><b>扩搜索空间。</b> medium_candidates 改为 [30, 365] 步长 7 天；large_candidates 加入 60/90/None。重跑得新最优周期，核对是否仍为边界。</span>
+      <span class="eta">1 h</span>
+      <span class="effort">低</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">3</span>
+      <span class="pr p1">P1 · 必做</span>
+      <span class="iss">F2 + F5</span>
+      <span class="task"><b>引入健康分组优化。</b> 按 HI 三分位分组，每组独立优化。让 HI 真正"工作"，同时让 10 台不再同方案。</span>
+      <span class="eta">2 h</span>
+      <span class="effort">低</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">4</span>
+      <span class="pr p1">P1 · 必做</span>
+      <span class="iss">S6</span>
+      <span class="task"><b>切换边界扫描。</b> 修完 F3 之后，把 (η<sub>m</sub>, η<sub>l</sub>) 在 [0.3, 3.0]² 上扫，做最优策略相图。让"鲁棒"从形容词变为定量边界。</span>
+      <span class="eta">1.5 h</span>
+      <span class="effort">中</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">5</span>
+      <span class="pr p1">P1 · 必做</span>
+      <span class="iss">S4 + S7 + N3</span>
+      <span class="task"><b>消除内部矛盾。</b> 季节项加 i 下标或修正描述（S4）；中维护频率改为 4.5–6.5（S7）；τ 单位拆分为时刻 / 寿命长度（N3）。这些是 30 分钟改完的"零成本"修补。</span>
+      <span class="eta">0.5 h</span>
+      <span class="effort">极低</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">6</span>
+      <span class="pr p2">P2 · 强烈建议</span>
+      <span class="iss">S1</span>
+      <span class="task"><b>维护 × 季节交互项。</b> 把 a<sub>k</sub> 升级为 a<sub>k</sub><sup>0</sup>(1 + φ<sub>k</sub> sin(ωt+ψ<sub>k</sub>))；估计后让最优维护时刻挑选最佳季节相位。直接呼应题面。</span>
+      <span class="eta">2 h</span>
+      <span class="effort">中</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">7</span>
+      <span class="pr p2">P2 · 强烈建议</span>
+      <span class="iss">S2</span>
+      <span class="task"><b>τ 嵌套估计。</b> 外层网格扫 τ_M, τ_L，内层 lsq；让"120/180" 名副其实。</span>
+      <span class="eta">1 h</span>
+      <span class="effort">低</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">8</span>
+      <span class="pr p2">P2 · 强烈建议</span>
+      <span class="iss">S5</span>
+      <span class="task"><b>Out-of-sample 回测。</b> 80/20 切分，给 §6 加一段"模型预测能力检验"，附 MAPE 表。论文可信度立刻 +1 档。</span>
+      <span class="eta">1.5 h</span>
+      <span class="effort">中</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">9</span>
+      <span class="pr p2">P2 · 强烈建议</span>
+      <span class="iss">S8</span>
+      <span class="task"><b>趋势二次化。</b> B(t) 加 −β₂t² 项，用 BIC 自动选模型；A4/A6 反常上行可能在二次形下被部分吸收。</span>
+      <span class="eta">1 h</span>
+      <span class="effort">低</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">10</span>
+      <span class="pr p3">P3 · 时间允许</span>
+      <span class="iss">O1</span>
+      <span class="task"><b>状态依赖维护策略。</b> 把决策从周期改为阈值，对比固定周期的成本节省。这是国一档的论文厚度。</span>
+      <span class="eta">3 h</span>
+      <span class="effort">高</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">11</span>
+      <span class="pr p3">P3 · 时间允许</span>
+      <span class="iss">O3 + O5</span>
+      <span class="task"><b>双层 MC + 熵权 HI。</b> 提升不确定性量化与权重客观性，整体加分。</span>
+      <span class="eta">1.5 h</span>
+      <span class="effort">中</span>
+    </div>
+
+    <div class="roadmap-row">
+      <span class="rk">12</span>
+      <span class="pr p3">P3 · 时间允许</span>
+      <span class="iss">N1 + N2 + S3</span>
+      <span class="task"><b>细节打磨。</b> 缺失率口径、保护窗扩宽、加性分解的预防针。每条 5 分钟。</span>
+      <span class="eta">0.5 h</span>
+      <span class="effort">极低</span>
+    </div>
+  </div>
+
+  <p class="note-line">
+    <b>P1 总工时 ~8.5 h</b> — 一个晚上 + 半天可以全部完成。完成 P1 后，论文从"有明显 bug 的合理框架"升级为"逻辑自洽且能解释边界的成熟模型"，再投入 P2 的 5.5 h，可以冲击国一。
+    <b>核心策略</b>：F1 + F4 + F3 是一个连锁——它们必须一起改才能让最优解从边界变为内点；改完后 F2 + F5 + S6 都会自然受益。
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- §6 AI 修订指令汇总 -->
+<!-- ============================================================ -->
+<section id="aiprompt">
+  <header class="sec-head">
+    <span class="num"><em>§</em>6</span>
+    <h2 class="tit">AI 修订指令汇总<small>Prompt Pack · 直接喂给 AI 进行 LaTeX 修订</small></h2>
+  </header>
+
+  <p class="lead">
+    把下面这段一次性喂给 LLM（建议 Opus 4.7 或 GPT-4 级别），就能拿到一份按本报告 P1 修复完的 LaTeX 增量补丁。如果想分批，按修复优先级 P1 / P2 / P3 切成三轮交付。
+  </p>
+
+  <div class="latex-patch">
+    <div class="label">AI 修订指令 · P1 第一轮</div>
+    <pre><span class="com">你是一名数学建模论文修订专家。我有一份关于"过滤设备监测"的 LaTeX 论文 (main_19.tex)，
+诊断报告指出以下 5 个 P1 必修问题。请按顺序生成 LaTeX 替换补丁，每个补丁包含：
+(1) 待替换的原文位置（章节号 + 行号区间）；
+(2) 替换前内容；
+(3) 替换后内容；
+(4) 该补丁需要重跑的代码段或重新计算的数字（标记为 \texttt{TODO} 占位）。</span>
+
+<span class="com">P1 修复任务清单：</span>
+
+【F1】修复"A4/A6 在 40 年内不报废"的模型缺陷
+- 模型假设第 8 条改为：引入工程寿命上限 $L_{\max}=12$ 年；
+- §5 增加新小节"A4/A6 反常上行讨论"，说明可能成因与处理方案；
+- §6 表 4 把 A4/A6 的"删失"标注改为"达到工程寿命上限"。
+
+【F4】修复"维护越少越好"的模型机制缺陷
+- 趋势项 \eqref{eq:trend} 改为带维护诱导基线抬升的形式（见报告补丁）；
+- 在 §5.1 第二段补一句话说明"该升级让维护对长期寿命产生显著正反馈"；
+- 重新估计 $b_M, b_L$ 系数，更新表 3 与 §5.2 全部数字。
+
+【F3】扩展周期搜索空间
+- 模型假设第 7 条改为：medium_candidates 范围 [30, 365] 天 步长 7；
+- §7.1 文字相应更新；
+- §7.2 增加"边界解检验"子节，给出最优 $\Delta^M$ 关于 $\bar C$ 的剖面图。
+
+【F2 + F5】基于 HI 的分组优化
+- 摘要末尾补一句"以 HI 为枢纽贯穿四问"；
+- §7.2 之后增加新小节"基于健康分层的差异化维护策略"；
+- 三组（健康/中等/关注）分别求解，给出 \texttt{tab:group_opt} 表格。
+
+【S6】切换边界扫描
+- §8 在原"单因素扰动"之后新增"最优策略的切换边界"小节；
+- 给出 $(C_M', C_L')$ 二维相图，标明策略类别区块；
+- 替换原"全场景策略不变"的表述。
+
+<span class="com">输出要求：
+- 每个补丁用 \begin{patch}...\end{patch} 包裹，并标注 [F1]/[F2] 等编号；
+- 数学公式严格使用 amsmath，不要混用 $...$ 与 \(...\)；
+- 中文字符不要拆碎，保持 ctex 兼容；
+- 涉及 CSV 文件读取的表格保持原 \IfFileExists 结构，仅修改表头与说明文字。</span></pre>
+  </div>
+
+  <h3 class="sub">如果一次只想改一个问题</h3>
+  <p>每个 issue 卡里都有可直接复制的"LaTeX 补丁"小代码块——直接把那一段连同它前后的说明（症状 + 根因 + 改进方案）一起喂给 AI，让 AI 根据补丁生成完整的 \verb|\section{...}| 替换块。这种"按需点菜"模式更适合迭代式修订。</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- 尾部 -->
+<!-- ============================================================ -->
+<footer class="colophon">
+  <span>Critical Review · A题 / 过滤设备监测 / main_19.tex</span>
+  <span class="sig">— 22 项问题诊断完毕，祝你冲击国一 —</span>
+</footer>
+
+</main>
+</div>
+</body>
+</html>
