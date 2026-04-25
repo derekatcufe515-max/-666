@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CUMCM 问题分析严谨性审阅报告</title>
+<style>
+:root {
+  --bg: #f7f4ee;
+  --paper: #fffdf9;
+  --ink: #1f2937;
+  --muted: #64748b;
+  --line: #e7ded2;
+  --accent: #8a5a2b;
+  --accent2: #2563eb;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --ok: #15803d;
+  --card: rgba(255,255,255,.78);
+  --shadow: 0 18px 50px rgba(76, 53, 33, .12);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(138,90,43,.18), transparent 28%),
+    radial-gradient(circle at 90% 10%, rgba(37,99,235,.10), transparent 30%),
+    linear-gradient(180deg, #fbf8f1 0%, var(--bg) 50%, #f3efe7 100%);
+  line-height: 1.78;
+}
+.header {
+  padding: 56px 22px 34px;
+  text-align: center;
+}
+.kicker {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid rgba(138,90,43,.20);
+  border-radius: 999px;
+  color: var(--accent);
+  background: rgba(255,255,255,.62);
+  font-weight: 700;
+  font-size: 13px;
+}
+h1 {
+  margin: 18px auto 12px;
+  max-width: 980px;
+  font-size: clamp(30px, 5vw, 56px);
+  line-height: 1.08;
+  letter-spacing: -1.2px;
+}
+.subtitle {
+  max-width: 860px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 17px;
+}
+.shell {
+  max-width: 1240px;
+  margin: 0 auto 60px;
+  padding: 0 22px;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 26px;
+}
+.sidebar {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+  background: rgba(255,255,255,.62);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(231,222,210,.9);
+  box-shadow: 0 10px 30px rgba(76,53,33,.08);
+  border-radius: 24px;
+  padding: 18px;
+}
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: var(--accent);
+  margin: 2px 0 12px;
+}
+.toc-item {
+  display: block;
+  text-decoration: none;
+  color: #334155;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.toc-item:hover { background: #f4eadb; color: #7c3f14; }
+.toc-l3 { padding-left: 24px; color: #64748b; font-size: 13px; }
+.content {
+  background: var(--paper);
+  border: 1px solid rgba(231,222,210,.95);
+  border-radius: 30px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.article {
+  padding: clamp(24px, 4.5vw, 58px);
+}
+.article > p:first-child {
+  font-size: 18px;
+  background: linear-gradient(135deg, rgba(138,90,43,.10), rgba(37,99,235,.06));
+  border: 1px solid rgba(138,90,43,.16);
+  padding: 20px 22px;
+  border-radius: 22px;
+}
+h2 {
+  margin: 42px 0 16px;
+  padding-top: 10px;
+  font-size: 28px;
+  line-height: 1.25;
+  letter-spacing: -.4px;
+  color: #1e293b;
+}
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 24px;
+  margin-right: 10px;
+  vertical-align: -4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--accent), #d6a15f);
+}
+h3 {
+  margin: 28px 0 10px;
+  font-size: 20px;
+  color: #334155;
+}
+strong { color: #111827; font-weight: 850; }
+em { color: #475569; }
+ul, ol { padding-left: 1.3em; }
+li { margin: .35em 0; }
+hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+  margin: 32px 0;
+}
+blockquote {
+  margin: 20px 0;
+  padding: 18px 20px;
+  border-left: 5px solid var(--accent2);
+  background: #f8fbff;
+  border-radius: 16px;
+  color: #243447;
+  box-shadow: inset 0 0 0 1px rgba(37,99,235,.08);
+}
+blockquote p { margin: .55em 0; }
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  background: #f2eee7;
+  padding: 2px 6px;
+  border-radius: 7px;
+}
+pre {
+  overflow-x: auto;
+  background: #111827;
+  color: #f8fafc;
+  padding: 18px;
+  border-radius: 18px;
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 22px 0;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(76,53,33,.06);
+}
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  background: #f4eadb;
+  color: #5f381a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: #fffaf2; }
+p:has(> strong:first-child) {
+  border-radius: 14px;
+}
+.article a { color: var(--accent2); }
+.math {
+  font-family: "Cambria Math", "Times New Roman", serif;
+  text-align: center;
+  background: #fbfaf7;
+  border: 1px dashed #dccbb8;
+  border-radius: 14px;
+  padding: 12px;
+  margin: 16px 0;
+}
+.footer {
+  padding: 20px 30px 34px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+  background: rgba(250,247,241,.7);
+}
+.badges {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+  max-width: 900px;
+  margin: 24px auto 0;
+}
+.badge {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.68);
+  border: 1px solid rgba(231,222,210,.9);
+  text-align: left;
+}
+.badge b { display:block; font-size: 17px; }
+.badge span { display:block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .badges { grid-template-columns: 1fr 1fr; }
+}
+@media print {
+  body { background: white; }
+  .sidebar { display: none; }
+  .shell { display: block; max-width: none; }
+  .content { box-shadow: none; border: none; }
+  .article { padding: 20mm; }
+}
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="kicker">CUMCM 论文审阅 · 问题分析严谨性</div>
+    <h1>第 2 章“问题分析”合理性与严谨性审阅报告</h1>
+    <p class="subtitle">围绕四问递进主线，聚焦建模逻辑、证据边界、潜在矛盾与可直接执行的修改提示词。</p>
+    <div class="badges">
+      <div class="badge"><b>主线成立</b><span>时序分解 → 寿命预测 → 优化 → 鲁棒性</span></div>
+      <div class="badge"><b>核心风险</b><span>问题三、问题四最容易被评委抓住</span></div>
+      <div class="badge"><b>修改方向</b><span>少说“证明”，多说“边界与假设”</span></div>
+      <div class="badge"><b>输出用途</b><span>适合直接放入 GitHub Pages 或本地打开</span></div>
+    </div>
+  </header>
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-title">目录</div>
+      <a class="toc-item toc-l2" href="#一-整体合理性-主线是成立的">一、整体合理性：主线是成立的</a>
+<a class="toc-item toc-l2" href="#二-问题一分析-方向很好-但-周期性-和-维护效应-的因果严谨性要补强">二、问题一分析：方向很好，但“周期性”和“维护效应”的因果严谨性要补强</a>
+<a class="toc-item toc-l3" href="#1-合理的地方">1. 合理的地方</a>
+<a class="toc-item toc-l3" href="#2-不够严谨的地方">2. 不够严谨的地方</a>
+<a class="toc-item toc-l3" href="#3-问题一建议评分">3. 问题一建议评分</a>
+<a class="toc-item toc-l2" href="#三-问题二分析-寿命判定逻辑正确-但长期外推风险需要主动承认">三、问题二分析：寿命判定逻辑正确，但长期外推风险需要主动承认</a>
+<a class="toc-item toc-l3" href="#1-合理的地方">1. 合理的地方</a>
+<a class="toc-item toc-l3" href="#2-不够严谨的地方">2. 不够严谨的地方</a>
+<a class="toc-item toc-l3" href="#3-问题二建议评分">3. 问题二建议评分</a>
+<a class="toc-item toc-l2" href="#四-问题三分析-工程可执行性强-但-最优-只能说是-约束策略集内最优">四、问题三分析：工程可执行性强，但“最优”只能说是“约束策略集内最优”</a>
+<a class="toc-item toc-l3" href="#1-合理的地方">1. 合理的地方</a>
+<a class="toc-item toc-l3" href="#2-不够严谨的地方">2. 不够严谨的地方</a>
+<a class="toc-item toc-l3" href="#3-问题三建议评分">3. 问题三建议评分</a>
+<a class="toc-item toc-l2" href="#五-问题四分析-思路合理-但现在有一个严重的结果矛盾风险">五、问题四分析：思路合理，但现在有一个严重的结果矛盾风险</a>
+<a class="toc-item toc-l3" href="#1-合理的地方">1. 合理的地方</a>
+<a class="toc-item toc-l3" href="#2-不够严谨的地方">2. 不够严谨的地方</a>
+<a class="toc-item toc-l3" href="#3-问题四建议评分">3. 问题四建议评分</a>
+<a class="toc-item toc-l2" href="#六-总评分与修改优先级">六、总评分与修改优先级</a>
+<a class="toc-item toc-l2" href="#七-可以直接让-ai-修改的标准提示词">七、可以直接让 AI 修改的标准提示词</a>
+    </aside>
+    <section class="content">
+      <article class="article">
+        <p>我仔细看了你论文第 2 章“问题分析”里 2.1—2.4 的内容。总体评价：<strong>框架方向是对的，四问之间的逻辑链条也比较清楚，属于“能支撑后文建模”的问题分析；但现在的问题是写得有点像“模型方法预告”，严谨性还差在证据支撑、边界限定和若干潜在矛盾上。</strong> 尤其是问题三、问题四，如果不改，评委可能会觉得你们“优化结果来得太顺”，甚至怀疑结论是模型设定导致的，而不是数据真正推出的。</p>
+<h2 id="一-整体合理性-主线是成立的">一、整体合理性：主线是成立的</h2><p>你们把题目抽象成：</p>
+<p><strong>透水率时序分解 → 当前策略下寿命预测 → 维护策略优化 → 成本扰动下鲁棒性检验</strong></p>
+<p>这个总链条是合理的。因为题目本质上不是单纯预测，也不是单纯优化，而是一个<strong>状态演化驱动的维护决策问题</strong>。透水率既受老化趋势影响，也受季节波动和维护事件影响；寿命又由滚动年均透水率阈值决定；成本优化还要依赖寿命预测结果。因此你们在总述中说“四个子问题之间存在动态耦合”，这个判断是准确的。</p>
+<p>但现在总述有一个问题：<strong>它说得比较宏观，没有提前点明本文建模的核心取舍。</strong> 例如你们后面实际上做了“周期策略网格搜索”，而不是完全自由的动态维护优化；做了“加性时序分解”，而不是非线性机器学习预测；做了“成本参数扰动”，而不是完整不确定性鲁棒优化。这些取舍都合理，但需要在问题分析里提前说清楚：<strong>我们不是追求最复杂，而是追求可解释、可复现、可执行。</strong></p>
+<p>可以在总述末尾补一句：</p>
+<blockquote>
+<p>因此，本文采用“可解释时序分解 + 状态递推仿真 + 有限周期策略搜索”的建模路线，在保证模型可解释性和工程可执行性的前提下，逐步回答四个子问题。</p>
+</blockquote>
+<p>这样会更像国赛论文的“问题分析”，而不是直接跳到模型细节。</p>
+<hr />
+<h2 id="二-问题一分析-方向很好-但-周期性-和-维护效应-的因果严谨性要补强">二、问题一分析：方向很好，但“周期性”和“维护效应”的因果严谨性要补强</h2><h3 id="1-合理的地方">1. 合理的地方</h3><p>问题一分析里最好的地方，是你们没有简单做“线性下降拟合”，而是意识到透水率包含三类信号：</p>
+<p><strong>长期趋势、季节周期、维护脉冲。</strong></p>
+<p>这个判断非常合理。你们后面还安排了整点对齐、维护保护窗口、滚动中位数异常识别、短缺口插值，再建立“趋势项 + 年周期双谐波季节项 + 维护恢复项 + 随机扰动”的加性分解模型；这个思路和题目的数据结构是匹配的。</p>
+<p>尤其是“维护保护窗口”这个点是加分项。因为维护日前后透水率突然变化，不能被粗暴当成异常点删掉。你们意识到了这一点，说明数据清洗逻辑不是机械套模板。</p>
+<h3 id="2-不够严谨的地方">2. 不够严谨的地方</h3><p>第一，<strong>“年周期”证据略弱。</strong></p>
+<p>你们说“跨年度重复的季节波动”，但数据时间范围只有 2024 年 4 月到 2026 年 4 月，满打满算约两年，而且整体缺失率很高。两年数据可以提出“可能存在年周期”，但直接说“年周期双谐波”会稍微强。更严谨的写法应该是：</p>
+<blockquote>
+<p>由于观测期覆盖两个自然年度，且图像上存在相近季节区间的重复波动，本文以一年周期谐波项近似刻画季节性，并在后续通过拟合残差和季节幅度检验其合理性。</p>
+</blockquote>
+<p>这样比直接说“存在年周期”稳。</p>
+<p>第二，<strong>加性分解模型可能忽略交互效应。</strong></p>
+<p>现在写法默认：</p>
+<div class="math">P_i(t)=趋势+季节+维护+随机误差</div>
+<p>也就是季节和维护效果相互独立。但现实中，维护效果可能和设备当前状态有关：透水率越低，维护提升越明显；设备越老，维护恢复越有限。大维护也可能不是“效果弱”，而是因为它常发生在设备更差的状态下，导致表面上提升不高。</p>
+<p>所以问题一分析里最好补一句限制：</p>
+<blockquote>
+<p>考虑到样本规模有限，本文首先采用加性结构获得可解释基准模型；对于维护效果可能受当前健康状态影响的问题，在维护前后窗口和后续敏感性分析中进行辅助检验。</p>
+</blockquote>
+<p>第三，<strong>维护前后 3 日、7 日窗口不是严格因果识别。</strong></p>
+<p>你们用“维护后均值 - 维护前均值”作为稳健性检验，这可以，但不能说得太强。因为维护前后透水率变化可能受到趋势项、季节项、回归均值效应影响。比如设备低到一定程度才维护，那么维护后自然会回升，这里面不全是维护带来的因果效果。</p>
+<p>建议把“维护影响”改成“维护前后关联变化”更严谨。比如：</p>
+<blockquote>
+<p>窗口法不单独作为因果识别工具，而作为事件回归结果的方向性验证。</p>
+</blockquote>
+<p>这句话很有用，能防止评委抓“因果不严谨”。</p>
+<h3 id="3-问题一建议评分">3. 问题一建议评分</h3><p><strong>合理性：8.5/10</strong>
+<strong>严谨性：7/10</strong></p>
+<p>方向没问题，但需要补周期性证据、因果措辞和加性模型局限。</p>
+<hr />
+<h2 id="三-问题二分析-寿命判定逻辑正确-但长期外推风险需要主动承认">三、问题二分析：寿命判定逻辑正确，但长期外推风险需要主动承认</h2><h3 id="1-合理的地方">1. 合理的地方</h3><p>问题二最合理的是你们抓住了题目的关键：<strong>寿命不是瞬时透水率低于 37，而是滚动 365 日平均透水率低于 37。</strong></p>
+<p>这一点非常重要。你们在问题分析里明确指出，静态阈值比较或单点外推都会偏离真实服役时间，所以要做动态仿真。这是对题意理解比较深的表现。</p>
+<p>此外，把问题一得到的趋势项、季节项、维护衰减状态变量拿来外推未来透水率，也符合“四问递进”的建模结构。用蒙特卡洛扰动刻画不确定性、对超长窗口未失效设备做右删失处理，这些写法也比普通论文更专业。</p>
+<h3 id="2-不够严谨的地方">2. 不够严谨的地方</h3><p>第一，<strong>“当前维护规律”不能只用历史平均频率粗略代替。</strong></p>
+<p>你们写的是“按历史平均维护频率外推未来的中维护与大维护事件”。这个做法能用，但略粗。因为“当前维护规律”可能不是简单平均频率，而可能是：</p>
+<ul>
+<li>固定周期维护；</li>
+<li>透水率低于某个水平后维护；</li>
+<li>中维护和大维护交替；</li>
+<li>按设备状态差异安排维护；</li>
+<li>数据中记录不完整导致的表观频率。</li>
+</ul>
+<p>如果只用平均频率，评委可能会问：你凭什么认为未来维护按平均间隔发生？</p>
+<p>建议补一句：</p>
+<blockquote>
+<p>由于题目未给出显式维护排程规则，本文以各设备历史维护间隔的平均水平近似当前维护制度，并在结果解释中将其视为“经验规则外推”而非精确排程。</p>
+</blockquote>
+<p>这能明显提升严谨性。</p>
+<p>第二，<strong>两年数据外推到多年寿命，风险很大。</strong></p>
+<p>你们的寿命预测要外推到 2027、2028、2030 甚至更远。用两年数据预测多年寿命，本来就是高不确定性问题。问题分析里已经提到蒙特卡洛扰动，但它主要处理随机残差，不一定处理参数不确定性、趋势不确定性和维护规则不确定性。</p>
+<p>建议加一句：</p>
+<blockquote>
+<p>寿命预测属于样本外长期外推，因此本文后续结果重点比较设备间相对风险排序，并通过残差扰动和删失处理避免对远期日期作过度精确解释。</p>
+</blockquote>
+<p>这句话很关键。国赛里，长期预测不要装得太准。</p>
+<p>第三，<strong>右删失处理要和后文结果保持一致。</strong></p>
+<p>你们问题二分析里说对超长仿真窗口仍未触发阈值的设备按右删失处理，这是对的。但我看到后文摘要和表格/正文之间存在明显不一致：摘要说 A4 与 A6 在 40 年仿真窗口内未触发阈值，正文表格附近又出现了具体预测日期和删失标记不一致的问题。这个虽然不是“问题分析”本身的错，但会严重影响问题二的可信度。必须统一。</p>
+<h3 id="3-问题二建议评分">3. 问题二建议评分</h3><p><strong>合理性：8/10</strong>
+<strong>严谨性：6.5/10</strong></p>
+<p>核心判据抓得准，但“当前规律外推”和“长期预测不确定性”要写得更谨慎。</p>
+<hr />
+<h2 id="四-问题三分析-工程可执行性强-但-最优-只能说是-约束策略集内最优">四、问题三分析：工程可执行性强，但“最优”只能说是“约束策略集内最优”</h2><h3 id="1-合理的地方">1. 合理的地方</h3><p>问题三分析里，你们指出年均成本目标是：</p>
+<div class="math">\bar C_i=\frac{C_{buy}+C_MN_i^M+C_LN_i^L}{L_i}</div>
+<p>而寿命 (L_i) 又由维护策略决定，所以分母是内生的，不能简单线性规划。这一点说得很好。你们还指出滚动 365 日阈值会让状态动态化，如果按事件级 0-1 变量建模，状态空间很大。这是比较专业的分析。</p>
+<p>把策略限制为规则周期策略，然后网格搜索，这个选择也合理。国赛不一定要上非常复杂的混合整数动态规划；能解释、能复现、能执行，往往更重要。</p>
+<h3 id="2-不够严谨的地方">2. 不够严谨的地方</h3><p>第一，<strong>“最优方案”必须限定范围。</strong></p>
+<p>现在问题三分析说“选出最优解”。但严格讲，你们不是在所有可能维护策略里找最优，而是在：</p>
+<p><strong>中维护周期 + 大维护周期构成的规则周期策略集合中找最优。</strong></p>
+<p>所以后文所有“最优方案”最好统一改成：</p>
+<blockquote>
+<p>在本文设定的周期策略可行域内，最优方案为……</p>
+</blockquote>
+<p>或者：</p>
+<blockquote>
+<p>工程周期策略下的最优方案为……</p>
+</blockquote>
+<p>这不是吹毛求疵。因为如果评委认为可以根据实时透水率做状态反馈维护，你们的周期策略就不一定全局最优。</p>
+<p>第二，<strong>周期搜索范围需要更强解释。</strong></p>
+<p>你们把中维护周期限定为 42 至 98 天，大维护周期限定为 120 至 360 天或不执行。这个设定在假设里出现了，但问题分析部分最好说明来源：是历史维护间隔范围？是工程上允许的检修频率？还是为了避免过度维护？</p>
+<p>如果不说明，评委会觉得你们人为把可行域设窄了，最后得到“98 天一次、大维护取消”可能只是边界效应。尤其 98 天是中维护周期上界，最优落在上界时，说明模型可能还想选更长周期，只是被你们的搜索范围卡住了。这一点非常重要。</p>
+<p>你们应当补一句：</p>
+<blockquote>
+<p>若最优解落在搜索区间边界，需进一步扩展区间进行边界检验，以确认该结果不是由人为上界导致。</p>
+</blockquote>
+<p>这个会显著提升严谨性。</p>
+<p>第三，<strong>大维护被取消的结论需要防止“选择偏差”。</strong></p>
+<p>你们后面结论说大维护单位收益不如中维护，所以取消大维护。但真实情况可能是：大维护通常发生在设备状态更差的时候，所以看起来恢复效果不如中维护；这不一定说明大维护没用。问题三分析中最好提前说明：</p>
+<blockquote>
+<p>对大维护收益的判断依赖问题一中的维护效应估计，若大维护主要发生在低健康状态设备上，则其估计值可能受选择偏差影响。</p>
+</blockquote>
+<p>这句话不会削弱论文，反而显得诚实、专业。</p>
+<p>第四，<strong>成本函数可能过窄。</strong></p>
+<p>现在年均成本只包含购置成本、中维护成本、大维护成本。如果题目明确只要求这些，那没问题；但如果题目背景涉及污水处理运行成本、停机损失、水质不达标损失、小维护成本，则你们需要说明为什么不纳入。现在假设里说“小维护成本忽略不计”，但停机损失和产能损失没有交代，容易被质疑。</p>
+<h3 id="3-问题三建议评分">3. 问题三建议评分</h3><p><strong>合理性：8/10</strong>
+<strong>严谨性：6/10</strong></p>
+<p>模型路线可行，但必须把“最优”的适用范围讲清楚，尤其要处理“边界最优”和“大维护选择偏差”两个风险点。</p>
+<hr />
+<h2 id="五-问题四分析-思路合理-但现在有一个严重的结果矛盾风险">五、问题四分析：思路合理，但现在有一个严重的结果矛盾风险</h2><h3 id="1-合理的地方">1. 合理的地方</h3><p>问题四的基本思路是对的：既然问题三的最优策略取决于购置成本摊销和维护成本之间的权衡，那么成本变化可能改变最优策略排序。因此重新运行周期搜索，观察最优策略和年均成本是否改变，这是合理的。</p>
+<p>单因素扰动 + 联合扰动，也符合数学建模竞赛常见敏感性分析套路。</p>
+<h3 id="2-不够严谨的地方">2. 不够严谨的地方</h3><p>第一，<strong>±30% 扰动范围需要解释。</strong></p>
+<p>你们直接设定 ±30%，这在建模竞赛里常见，但最好说明：</p>
+<blockquote>
+<p>取 ±30% 是为了覆盖设备采购价格、人工维护成本和材料成本在实际经营中的中等幅度波动区间。</p>
+</blockquote>
+<p>否则显得随意。</p>
+<p>第二，<strong>只做“同幅联合扰动”不够全面。</strong></p>
+<p>你们写的是三者同幅联合扰动，也就是购置成本、中维护成本、大维护成本一起乘 0.7、0.8、……、1.3。这个能看整体成本上升下降，但不能看真正关键的相对价格变化。比如：</p>
+<ul>
+<li>购置成本上升、中维护成本下降；</li>
+<li>大维护成本下降、中维护成本上升；</li>
+<li>购置成本下降、大维护成本下降；</li>
+<li>中维护成本大幅上升、大维护成本不变。</li>
+</ul>
+<p>这些组合更可能改变策略结构。建议至少做一个二维敏感性热力图，例如：</p>
+<p><strong>中维护成本系数 × 大维护成本系数</strong></p>
+<p>或者：</p>
+<p><strong>购置成本系数 × 中维护成本系数</strong></p>
+<p>这样才能说明“策略结构是否稳定”。</p>
+<p>第三，<strong>这里有一个很危险的文本矛盾。</strong></p>
+<p>你们问题四分析说要记录“策略结构是否发生改变”，这个写法是对的。但后面表 8 里部分场景已经显示“策略改变 = 是”，比如中维护成本低到 0.7、0.8，购置成本升到 1.2、1.3 的场景；可是正文又说“全部代表性扰动场景下，最优维护结构均未发生变化”。这个是硬伤。它会让评委觉得你们没有认真核对结果。</p>
+<p>这部分必须改。要么你检查代码和表格，确认到底变没变；要么把结论改成：</p>
+<blockquote>
+<p>在大多数扰动场景下，最优策略结构保持稳定；但当中维护成本显著下降或购置成本显著上升时，部分设备的最优周期组合发生变化，说明基准方案具有较强但非绝对的鲁棒性。</p>
+</blockquote>
+<p>这比“全部不变”严谨得多。</p>
+<h3 id="3-问题四建议评分">3. 问题四建议评分</h3><p><strong>合理性：7.5/10</strong>
+<strong>严谨性：5.5/10</strong></p>
+<p>分析思路对，但当前“表格与文字结论冲突”是必须马上修的硬问题。</p>
+<hr />
+<h2 id="六-总评分与修改优先级">六、总评分与修改优先级</h2><p>综合来看：</p>
+<table>
+<thead>
+<tr>
+  <th>部分</th>
+  <th style="text-align:right">合理性</th>
+  <th style="text-align:right">严谨性</th>
+  <th>主要问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>问题一</td>
+  <td style="text-align:right">8.5</td>
+  <td style="text-align:right">7.0</td>
+  <td>周期性证据、维护因果识别不够严谨</td>
+</tr>
+<tr>
+  <td>问题二</td>
+  <td style="text-align:right">8.0</td>
+  <td style="text-align:right">6.5</td>
+  <td>当前维护规律外推过粗，长期预测风险要承认</td>
+</tr>
+<tr>
+  <td>问题三</td>
+  <td style="text-align:right">8.0</td>
+  <td style="text-align:right">6.0</td>
+  <td>“最优”范围要限定，边界最优和大维护偏差要解释</td>
+</tr>
+<tr>
+  <td>问题四</td>
+  <td style="text-align:right">7.5</td>
+  <td style="text-align:right">5.5</td>
+  <td>扰动不够全面，且后文结论与表格存在冲突</td>
+</tr>
+</tbody>
+</table>
+<p><strong>最需要优先改的不是问题一，而是问题三和问题四。</strong></p>
+<p>问题一、二属于“再严谨一点会更好”；问题三、四属于“不改可能被评委抓住”的地方。</p>
+<hr />
+<h2 id="七-可以直接让-ai-修改的标准提示词">七、可以直接让 AI 修改的标准提示词</h2><p>你可以把下面这段直接发给另一个 AI，让它只改“问题分析”部分：</p>
+<blockquote>
+<p>请以 CUMCM 国赛优秀论文标准，重写本文第 2 章“问题分析”中的 2.1—2.4。要求：</p>
+<ol>
+<li>保留原有四问递进结构：时序分解 → 寿命预测 → 维护优化 → 成本敏感性分析。</li>
+<li>问题一中强调透水率由长期趋势、季节波动、维护脉冲共同影响，但要避免过度因果表述；将维护前后窗口法表述为事件回归结果的稳健性检验，而不是严格因果识别。</li>
+<li>问题二中明确寿命由滚动 365 日平均透水率首次低于阈值决定；说明当前维护规律因题目未给出显式规则，采用历史维护间隔/频率近似外推；承认长期外推存在不确定性。</li>
+<li>问题三中说明年均成本目标的分母寿命由维护策略内生决定，因此直接线性规划困难；本文将优化限定在“规则周期维护策略集合”内，所得最优解应表述为“周期策略可行域内最优”，不能写成无条件全局最优；补充边界最优需要检验。</li>
+<li>问题四中说明敏感性分析不仅要看成本绝对值变化，还要看最优策略结构是否变化；不得写“全部场景均不变”，除非表格确实支持。若表格中存在策略改变，应改成“大多数场景稳定，个别极端场景发生改变”。</li>
+<li>语言要求正式、克制、严谨，避免夸大模型能力，不要提前写具体数值结果，重点写建模逻辑和方法选择理由。</li>
+<li>输出 LaTeX 段落代码，只输出第 2 章“问题分析”及 2.1—2.4，不要改其他章节。</li>
+</ol>
+</blockquote>
+<p>我的判断很明确：<strong>这部分底子不差，主线是对的；但现在还不够“评委友好”。你要把语气从“我们已经证明了”改成“我们基于数据特征选择了这个可解释且可执行的方法，并清楚知道它的边界”。这会让论文可信度上一个档次。</strong></p>
+
+      </article>
+      <div class="footer">HTML generated from the provided Markdown content · single-file layout</div>
+    </section>
+  </main>
+</body>
+</html>
