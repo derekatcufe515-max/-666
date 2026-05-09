@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第七章 · 生产成本 · 学习路线</title>
+
+<!-- 字体：主用 Google Fonts，备用 jsDelivr（国内访问稳定） -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Public+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/eb-garamond@5.0.5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/public-sans@5.0.5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5.0.5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.5/index.css">
+
+<!-- KaTeX -->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+
+<style>
+:root{
+  --bg:#f5f1e8;
+  --bg-paper:#faf6ec;
+  --bg-card:#ede7d8;
+  --ink:#1a1814;
+  --ink-soft:#3d3930;
+  --ink-muted:#7a7568;
+  --rule:#c8c0ac;
+  --rule-soft:#ddd5bf;
+  --accent:#8a1a1a;
+  --accent-soft:#b85450;
+  --gold:#b8923a;
+
+  --serif-cn:'Noto Serif SC','Source Han Serif SC','Songti SC','STSongti-SC','STSong','SimSun','宋体',serif;
+  --sans-cn:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei','微软雅黑',sans-serif;
+  --serif:'EB Garamond','New York','Iowan Old Style','Charter','Georgia',serif;
+  --sans:'Public Sans','SF Pro Text',-apple-system,system-ui,sans-serif;
+  --mono:'JetBrains Mono','SF Mono','Menlo',Consolas,monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(circle at 18% 22%,rgba(184,146,58,.05) 0%,transparent 45%),
+    radial-gradient(circle at 82% 78%,rgba(138,26,26,.035) 0%,transparent 45%);
+  color:var(--ink);
+  font-family:var(--sans-cn),var(--sans);
+  font-weight:400;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  letter-spacing:.01em;
+  min-height:100vh;
+}
+
+article{max-width:760px;margin:0 auto;padding:64px 32px 96px}
+
+/* ========== MASTHEAD ========== */
+.masthead{
+  border-top:4px double var(--ink);
+  border-bottom:1px solid var(--rule);
+  padding:18px 0 14px;
+  margin-bottom:48px;
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  font-family:var(--serif);
+  font-size:.78rem;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.masthead .imprint{font-style:italic;letter-spacing:.1em;text-transform:none;font-size:.85rem}
+
+/* ========== COVER ========== */
+header.cover{text-align:center;padding:32px 0 56px;position:relative}
+
+header.cover .roman{
+  font-family:var(--serif);
+  font-size:clamp(7rem,18vw,11rem);
+  font-weight:500;
+  line-height:.9;
+  color:var(--accent);
+  letter-spacing:-.02em;
+  margin-bottom:4px;
+  font-feature-settings:"lnum";
+}
+
+header.cover .label{
+  font-family:var(--serif-cn);
+  font-size:.85rem;
+  letter-spacing:.5em;
+  color:var(--ink-muted);
+  margin-bottom:36px;
+  padding-left:.5em;
+}
+
+header.cover h1{
+  font-family:var(--serif-cn);
+  font-weight:700;
+  font-size:clamp(2.4rem,6vw,3.2rem);
+  letter-spacing:.18em;
+  line-height:1.2;
+  color:var(--ink);
+  margin-bottom:18px;
+  padding-left:.18em;
+}
+
+header.cover .dek{
+  font-family:var(--serif-cn);
+  font-style:italic;
+  font-weight:400;
+  font-size:1.02rem;
+  color:var(--ink-soft);
+  letter-spacing:.04em;
+  max-width:520px;
+  margin:0 auto 32px;
+  line-height:1.7;
+}
+
+header.cover .meta{
+  font-family:var(--serif);
+  font-size:.85rem;
+  color:var(--ink-muted);
+  letter-spacing:.18em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+}
+header.cover .ornament{
+  display:inline-block;
+  width:64px;
+  height:1px;
+  background:var(--rule);
+}
+
+/* ========== SECTIONS ========== */
+section{margin-bottom:60px}
+
+h2{
+  font-family:var(--serif-cn);
+  font-weight:700;
+  font-size:1.55rem;
+  color:var(--ink);
+  margin-bottom:24px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--rule);
+  display:flex;
+  align-items:baseline;
+  gap:18px;
+}
+h2 .num{
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:1rem;
+  color:var(--accent);
+  font-weight:600;
+  letter-spacing:.05em;
+}
+
+h3{
+  font-family:var(--serif-cn);
+  font-weight:700;
+  font-size:1.05rem;
+  color:var(--ink);
+  margin:28px 0 12px;
+}
+
+p{margin-bottom:14px;color:var(--ink-soft)}
+p strong,li strong{color:var(--ink);font-weight:700}
+
+/* ========== TABLES ========== */
+.table-wrap{margin:24px -8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:var(--sans-cn);
+  font-size:.92rem;
+  min-width:480px;
+}
+table thead{
+  border-top:2px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+}
+table th{
+  font-family:var(--serif-cn);
+  font-weight:500;
+  text-align:left;
+  padding:12px 14px;
+  color:var(--ink);
+  font-size:.78rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+table td{
+  padding:14px;
+  color:var(--ink-soft);
+  border-bottom:1px solid var(--rule-soft);
+  vertical-align:top;
+}
+table tbody tr:last-child td{border-bottom:1px solid var(--ink)}
+
+.grade-A{
+  display:inline-block;
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:700;
+  color:var(--accent);
+  padding:1px 9px;
+  border:1px solid var(--accent);
+  border-radius:2px;
+  font-size:.85rem;
+}
+.grade-B{
+  display:inline-block;
+  font-family:var(--serif);
+  font-style:italic;
+  color:var(--ink-muted);
+  padding:1px 9px;
+  border:1px solid var(--rule);
+  border-radius:2px;
+  font-size:.85rem;
+}
+.grade-skip{
+  font-family:var(--serif);
+  font-style:italic;
+  color:var(--ink-muted);
+  font-size:.85rem;
+}
+
+/* ========== PARALLEL TABLE ========== */
+.compare th:first-child,
+.compare td:first-child{
+  font-family:var(--serif-cn);
+  font-weight:500;
+  color:var(--ink-muted);
+  width:32%;
+  text-transform:none;
+  letter-spacing:0;
+  font-size:.88rem;
+}
+.compare td:nth-child(3){
+  background:rgba(184,146,58,.07);
+  font-weight:500;
+  color:var(--ink);
+}
+.compare th:nth-child(3){background:rgba(184,146,58,.07)}
+
+/* ========== PULL QUOTE ========== */
+.pullquote{
+  border-left:3px solid var(--accent);
+  padding:18px 26px;
+  margin:32px 0;
+  font-family:var(--serif-cn);
+  font-style:italic;
+  font-size:1.08rem;
+  line-height:1.7;
+  color:var(--ink);
+  background:rgba(184,146,58,.06);
+}
+.pullquote cite{
+  display:block;
+  margin-top:10px;
+  font-size:.82rem;
+  font-style:normal;
+  color:var(--ink-muted);
+  letter-spacing:.1em;
+  font-family:var(--serif);
+}
+
+/* ========== FORMULA CARDS ========== */
+.formulas{counter-reset:f;display:grid;gap:14px;margin:24px 0}
+
+.fcard{
+  counter-increment:f;
+  background:var(--bg-paper);
+  border:1px solid var(--rule-soft);
+  padding:18px 24px 18px 60px;
+  position:relative;
+  border-radius:2px;
+}
+.fcard::before{
+  content:counter(f,decimal-leading-zero);
+  position:absolute;
+  left:18px;
+  top:18px;
+  font-family:var(--serif);
+  font-size:.88rem;
+  font-style:italic;
+  color:var(--accent);
+  font-weight:700;
+  letter-spacing:.05em;
+}
+.fcard .math{
+  font-size:1rem;
+  color:var(--ink);
+  margin-bottom:6px;
+  display:block;
+}
+.fcard .desc{
+  font-size:.92rem;
+  color:var(--ink-soft);
+  line-height:1.6;
+}
+.fcard.starred{
+  border-left:3px solid var(--accent);
+}
+.fcard.starred .desc strong{color:var(--accent)}
+
+/* ========== PROBLEM CARDS ========== */
+.problem{
+  background:var(--bg-paper);
+  border:1px solid var(--rule-soft);
+  border-left:4px solid var(--accent);
+  padding:24px 28px;
+  margin:24px 0;
+  border-radius:2px;
+}
+.problem-header{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:1px dashed var(--rule);
+  flex-wrap:wrap;
+}
+.problem-num{
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:700;
+  color:var(--accent);
+  font-size:1.25rem;
+  letter-spacing:.02em;
+}
+.problem-title{
+  font-family:var(--serif-cn);
+  font-weight:700;
+  color:var(--ink);
+  font-size:1rem;
+}
+.problem-source{
+  margin-left:auto;
+  font-family:var(--serif);
+  font-style:italic;
+  color:var(--ink-muted);
+  font-size:.82rem;
+}
+.problem-stmt{
+  font-size:.96rem;
+  color:var(--ink);
+  margin-bottom:14px;
+  line-height:1.75;
+}
+
+details.solution{margin-top:8px}
+details.solution summary{
+  cursor:pointer;
+  font-family:var(--serif-cn);
+  font-size:.88rem;
+  color:var(--accent);
+  font-weight:500;
+  letter-spacing:.08em;
+  padding:6px 0;
+  list-style:none;
+  user-select:none;
+}
+details.solution summary::-webkit-details-marker{display:none}
+details.solution summary::before{
+  content:"▸";
+  display:inline-block;
+  margin-right:8px;
+  transition:transform .2s ease;
+  font-size:.85em;
+}
+details.solution[open] summary::before{transform:rotate(90deg)}
+
+.solution-body{
+  margin-top:14px;
+  padding:18px 20px;
+  background:rgba(138,26,26,.04);
+  border-radius:2px;
+  font-size:.93rem;
+  color:var(--ink-soft);
+  line-height:1.8;
+}
+.solution-body strong{color:var(--accent)}
+.solution-body .step{
+  display:block;
+  margin:6px 0;
+}
+.solution-body .tip{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px dashed var(--rule);
+  font-style:italic;
+  color:var(--ink);
+}
+
+/* ========== TIME PLAN ========== */
+.time-plan{
+  background:var(--bg-paper);
+  border-top:2px solid var(--ink);
+  border-bottom:2px solid var(--ink);
+  padding:20px 0;
+  margin:24px 0;
+}
+.time-plan ul{list-style:none}
+.time-plan li{
+  display:flex;
+  align-items:baseline;
+  gap:18px;
+  padding:8px 24px;
+  font-size:.95rem;
+}
+.time-plan .clock{
+  font-family:var(--serif);
+  font-style:italic;
+  color:var(--accent);
+  font-weight:700;
+  min-width:88px;
+  flex-shrink:0;
+  letter-spacing:.02em;
+}
+.time-plan li.total{
+  border-top:1px solid var(--rule);
+  margin-top:8px;
+  padding-top:14px;
+  font-family:var(--serif-cn);
+  font-weight:700;
+  color:var(--ink);
+}
+
+/* ========== PROGRESS ========== */
+.progress{
+  font-size:.94rem;
+  color:var(--ink-soft);
+  background:var(--bg-card);
+  padding:22px 26px;
+  border-radius:2px;
+  border-left:3px solid var(--gold);
+}
+.progress strong{color:var(--ink)}
+.progress .label{
+  display:inline-block;
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:.78rem;
+  color:var(--accent);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.progress ul{list-style:none;margin-top:8px}
+.progress li{padding:3px 0;display:flex;gap:12px}
+.progress li::before{
+  content:"—";
+  color:var(--ink-muted);
+  font-family:var(--serif);
+}
+
+/* ========== FOOTER ========== */
+footer.colophon{
+  margin-top:80px;
+  padding-top:24px;
+  border-top:4px double var(--ink);
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:.84rem;
+  color:var(--ink-muted);
+  text-align:center;
+  letter-spacing:.1em;
+}
+footer.colophon .symbol{
+  font-size:1.4rem;
+  color:var(--accent);
+  margin:0 14px;
+  font-style:normal;
+}
+
+/* ========== KaTeX ========== */
+.katex{font-size:1.04em !important}
+.katex-display{margin:14px 0 !important}
+
+/* ========== MOBILE ========== */
+@media (max-width:640px){
+  article{padding:32px 18px 64px}
+  header.cover{padding:24px 0 40px}
+  header.cover .label{letter-spacing:.4em;margin-bottom:28px}
+  header.cover h1{letter-spacing:.12em}
+  h2{font-size:1.32rem}
+  table th,table td{padding:10px 9px}
+  .fcard{padding:16px 18px 16px 48px}
+  .fcard::before{left:14px;top:16px}
+  .problem{padding:20px 22px}
+  .problem-source{margin-left:0;width:100%}
+  .time-plan li{padding:8px 18px;gap:12px}
+  .time-plan .clock{min-width:70px;font-size:.88rem}
+  .pullquote{padding:14px 20px;font-size:1rem}
+  .progress{padding:18px 20px}
+  .masthead{font-size:.7rem;letter-spacing:.15em}
+  .masthead .imprint{font-size:.78rem}
+}
+
+/* ========== PRINT ========== */
+@media print{
+  body{background:#fff}
+  article{max-width:none;padding:24px}
+  details.solution{display:block}
+  details.solution[open] summary::before,
+  details.solution summary::before{transform:rotate(90deg)}
+  details.solution > *{display:block !important}
+}
+</style>
+
+</head>
+<body>
+<article>
+
+<div class="masthead">
+  <span>微观经济学 · 平狄克 第九版</span>
+  <span class="imprint">Course Notes — Derek</span>
+</div>
+
+<header class="cover">
+  <div class="roman">VII</div>
+  <div class="label">第 七 章</div>
+  <h1>生 产 成 本</h1>
+  <p class="dek">从短期到长期，从消费者到生产者——<br>同一个最优化问题，两副面孔。</p>
+  <div class="meta">
+    <span class="ornament"></span>
+    <span>课时 4 · 自学 3–4h · 大纲 §3.2</span>
+    <span class="ornament"></span>
+  </div>
+</header>
+
+<!-- ============ 大纲优先级 ============ -->
+
+<section>
+  <h2><span class="num">i.</span>大纲优先级</h2>
+  <p>老师 PPT 共 80 页，但考试不是所有内容平均权重。按教学大纲 §3.2 的能力目标过滤后，重点只有三块。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>内容</th><th>等级</th><th>投入</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>短期成本曲线 + MC/AVC/ATC 关系</td><td><span class="grade-A">A</span></td><td>重</td></tr>
+        <tr><td>长期成本（等成本线、成本最小化）</td><td><span class="grade-A">A</span></td><td>重</td></tr>
+        <tr><td>长期与短期成本曲线关系（包络线）</td><td><span class="grade-A">A</span></td><td>重</td></tr>
+        <tr><td>经济成本 vs 会计成本</td><td><span class="grade-B">B</span></td><td>5 分钟</td></tr>
+        <tr><td>范围经济、学习曲线（PPT 62–74）</td><td><span class="grade-skip">大纲未列</span></td><td>扫一眼</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 核心洞察 ============ -->
+
+<section>
+  <h2><span class="num">ii.</span>核心洞察 · 孪生关系</h2>
+  <p>你已经掌握了消费者最优化。<strong>成本最小化是同一个数学问题换变量名而已</strong>。把这张表内化，本章一半的内容就解决了。</p>
+
+  <div class="table-wrap">
+    <table class="compare">
+      <thead>
+        <tr><th></th><th>消费者</th><th>生产者（成本最小化）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>目标</td><td>$\max\ U(x,y)$</td><td>$\min\ wL+rK$</td></tr>
+        <tr><td>约束</td><td>$p_x x + p_y y = I$</td><td>$Q = f(L,K)$</td></tr>
+        <tr><td>切线条件</td><td>$\mathrm{MRS} = p_x/p_y$</td><td>$\mathrm{MRTS} = w/r$</td></tr>
+        <tr><td>等价表达</td><td>$\dfrac{MU_x}{MU_y}=\dfrac{p_x}{p_y}$</td><td>$\dfrac{MP_L}{MP_K}=\dfrac{w}{r}$</td></tr>
+        <tr><td>最后一元原理</td><td>$\dfrac{MU_x}{p_x}=\dfrac{MU_y}{p_y}$</td><td>$\dfrac{MP_L}{w}=\dfrac{MP_K}{r}$</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pullquote">
+    用于购买劳动的最后 1 美元的边际产品，等于用于购买资本的最后 1 美元的边际产品。
+    <cite>— PPT 第 36 页</cite>
+  </div>
+
+  <p>这一句翻译过来就是 $MP_L/w = MP_K/r$。一次拉格朗日两边都对。</p>
+</section>
+
+<!-- ============ 必背公式 ============ -->
+
+<section>
+  <h2><span class="num">iii.</span>必背六条</h2>
+
+  <div class="formulas">
+    <div class="fcard">
+      <span class="math">$TC = FC + VC,\quad MC = \dfrac{dTC}{dQ} = \dfrac{dVC}{dQ}$</span>
+      <span class="desc">总成本 = 固定 + 可变；边际成本对 FC 求导为零，所以只看 VC。</span>
+    </div>
+
+```
+<div class="fcard starred">
+  <span class="math">$MC = \dfrac{w}{MP_L}$</span>
+  <span class="desc"><strong>生产函数 ↔ 成本函数的桥</strong>。MP 越低，多产一单位需要的劳动越多，MC 越高。</span>
+</div>
+
+<div class="fcard">
+  <span class="math">$MC$ 从下方穿过 $AVC$、$ATC$ 的最低点</span>
+  <span class="desc">来自"边际拉平均"的代数事实：$MC < ATC$ 时 $ATC$ 下降，反之上升。</span>
+</div>
+
+<div class="fcard">
+  <span class="math">$\min ATC$ 的产量 $>$ $\min AVC$ 的产量</span>
+  <span class="desc">因为 $AFC$ 一直降，所以 $ATC$ 的最低点被 $AFC$ "拖"到更右侧。</span>
+</div>
+
+<div class="fcard">
+  <span class="math">长期成本最小化条件： $\dfrac{MP_L}{w} = \dfrac{MP_K}{r}$</span>
+  <span class="desc">等成本线与等产量线相切。Cobb-Douglas 永远有 $K/L = (\beta/\alpha)(w/r)$，秒解。</span>
+</div>
+
+<div class="fcard starred">
+  <span class="math">$LAC$ 是 $SAC$ 族的下包络线，但 $LMC$ <strong>不是</strong> $SMC$ 的包络线</span>
+  <span class="desc"><strong>高频考点</strong>，PPT 60–61 页特别强调。$LMC$ 只取每个最优规模那一点对应的 $SMC$ 值。</span>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ============ 母题 ============ -->
+
+<section>
+  <h2><span class="num">iv.</span>三道母题</h2>
+  <p>覆盖大纲 A 级目标的最小子集。先合上答案做，做完再展开核对。</p>
+
+  <!-- 母题 1 -->
+
+  <div class="problem">
+    <div class="problem-header">
+      <span class="problem-num">i.</span>
+      <span class="problem-title">Cobb-Douglas 成本最小化</span>
+      <span class="problem-source">PPT § 78</span>
+    </div>
+    <div class="problem-stmt">
+      已知生产函数 $Q = L^{2/3}\, K^{1/3}$，劳动价格 $w=2$，资本价格 $r=1$。求 $Q=800$ 时实现成本最小化的 $L^*,\ K^*,\ C^*$。
+    </div>
+    <details class="solution">
+      <summary>展开解答</summary>
+      <div class="solution-body">
+        <span class="step"><strong>步 1.</strong> 算 MRTS：$MP_L = \tfrac{2}{3}L^{-1/3}K^{1/3}$，$MP_K = \tfrac{1}{3}L^{2/3}K^{-2/3}$，相除得 $\mathrm{MRTS} = 2K/L$。</span>
+        <span class="step"><strong>步 2.</strong> 切线条件：$2K/L = w/r = 2 \Rightarrow K = L$。</span>
+        <span class="step"><strong>步 3.</strong> 代回生产函数：$L^{2/3}\cdot L^{1/3} = L = 800$。</span>
+        <span class="step"><strong>结果：</strong> $L^* = K^* = 800,\quad C^* = 2(800)+1(800) = 2400$。</span>
+        <div class="tip">秒解技巧：Cobb-Douglas 在 $\mathrm{MRTS}=w/r$ 下永远得到 $K/L = (\beta/\alpha)(w/r)$，背下来。</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 母题 2 -->
+
+  <div class="problem">
+    <div class="problem-header">
+      <span class="problem-num">ii.</span>
+      <span class="problem-title">从 MC 反推 TC 族</span>
+      <span class="problem-source">PPT § 79</span>
+    </div>
+    <div class="problem-stmt">
+      已知 $MC(Q) = 3Q^2 - 30Q + 100$，$TC(10) = 1000$。求 $FC$、$TC(Q)$、$VC(Q)$、$AC(Q)$、$AVC(Q)$。
+    </div>
+    <details class="solution">
+      <summary>展开解答</summary>
+      <div class="solution-body">
+        <span class="step"><strong>步 1.</strong> 积分得 VC：$VC(Q) = \int MC\, dQ = Q^3 - 15Q^2 + 100Q$（用 $VC(0)=0$ 锚定常数）。</span>
+        <span class="step"><strong>步 2.</strong> 算 $VC(10) = 1000 - 1500 + 1000 = 500$。</span>
+        <span class="step"><strong>步 3.</strong> $FC = TC(10) - VC(10) = 1000 - 500 = 500$。</span>
+        <span class="step"><strong>结果：</strong></span>
+        <span class="step">$\quad TC(Q) = Q^3 - 15Q^2 + 100Q + 500$</span>
+        <span class="step">$\quad AC(Q) = Q^2 - 15Q + 100 + 500/Q$</span>
+        <span class="step">$\quad AVC(Q) = Q^2 - 15Q + 100$</span>
+        <div class="tip">关键技巧：永远用 $VC(0)=0$ 定积分常数。这类题没有别的入口。</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 母题 3 -->
+
+  <div class="problem">
+    <div class="problem-header">
+      <span class="problem-num">iii.</span>
+      <span class="problem-title">短期-长期成本曲线关系（画图题）</span>
+      <span class="problem-source">PPT § 56–61</span>
+    </div>
+    <div class="problem-stmt">
+      画一组 $SAC_1, SAC_2, SAC_3$ 与 $LAC$，并回答：<br>
+      ① 为什么 $LAC$ 是 $SAC$ 族的下包络线？<br>
+      ② 哪个产量上 $SAC$ 与 $LAC$ 相切？切点是不是 $SAC$ 的最低点？<br>
+      ③ 为什么 $LMC$ <strong>不是</strong> $SMC$ 的包络线？
+    </div>
+    <details class="solution">
+      <summary>展开解答提示</summary>
+      <div class="solution-body">
+        <span class="step"><strong>① </strong>长期可调规模，所以每个产量上选最优工厂规模 → 最低成本 → 包络下方所有 SAC。</span>
+        <span class="step"><strong>② </strong>切点 = 该规模下生产该产量的最优。<strong>除非</strong>恰好是 LAC 最低点（CRS 临界），否则切点不是 SAC 的最低点。规模经济区切点在 SAC 最低点左侧；规模不经济区切点在右侧。</span>
+        <span class="step"><strong>③ </strong>$LMC$ 是"按最优规模生产"时的 $SMC$ 值轨迹，只取每个 SMC 曲线的<strong>一个点</strong>，不是整段。所以 $LMC$ 不可能是 $SMC$ 的包络线。</span>
+        <div class="tip">这题理解透了能秒杀本章 70% 的概念题。要详细画图就告诉我。</div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ 时间预算 ============ -->
+
+<section>
+  <h2><span class="num">v.</span>时间预算</h2>
+  <p>老师 4 学时，你自学按下列分配，3–4 小时打到 A 级水平。</p>
+
+  <div class="time-plan">
+    <ul>
+      <li><span class="clock">0:30</span><span>扫 PPT 关键页（17、24–26、33、42、56–61）</span></li>
+      <li><span class="clock">1:00</span><span>背公式 + 内化消费者-生产者孪生关系</span></li>
+      <li><span class="clock">1:30</span><span>做 3 道母题 + 自出 1 道变式</span></li>
+      <li><span class="clock">0:30</span><span>用大纲 A 级要求自检</span></li>
+      <li class="total"><span class="clock">3:30</span><span>合计</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 进度备忘 ============ -->
+
+<section>
+  <h2><span class="num">vi.</span>进度备忘</h2>
+
+  <div class="progress">
+    <span class="label">Status · Microeconomics</span>
+    <ul>
+      <li><strong>当前：</strong>第 7 章（跟老师进度）</li>
+      <li><strong>待补：</strong>第 1–6 章<em>（建议第 4 章·市场需求/收入替代效应优先回补）</em></li>
+      <li><strong>后续：</strong>第 8–16 章<em>（缺第 5、15 章 PPT）</em></li>
+    </ul>
+  </div>
+</section>
+
+<footer class="colophon">
+  <span class="symbol">§</span>
+  Set in Noto Serif · EB Garamond · Public Sans
+  <span class="symbol">§</span>
+</footer>
+
+</article>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$",  right: "$",  display: false},
+      {left: "\\[", right: "\\]", display: true},
+      {left: "\\(", right: "\\)", display: false}
+    ],
+    throwOnError: false
+  });
+});
+</script>
+
+</body>
+</html>
