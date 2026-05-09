@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小组决策方案 · 文物中的伟大建党精神</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1614;
+    --ink-soft: #3d3530;
+    --ink-faded: #6b5f56;
+    --paper: #f4ede0;
+    --paper-warm: #ebe1cf;
+    --paper-deep: #ddd0b8;
+    --crimson: #8b1a1a;
+    --crimson-deep: #6b1010;
+    --crimson-bright: #b22222;
+    --gold: #a67c2e;
+    --gold-deep: #7a5a1f;
+    --rule: rgba(26, 22, 20, 0.18);
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+font-family: ‘Noto Sans SC’, sans-serif;
+background-color: var(–paper);
+background-image:
+radial-gradient(circle at 20% 30%, rgba(139, 26, 26, 0.04) 0%, transparent 40%),
+radial-gradient(circle at 80% 70%, rgba(166, 124, 46, 0.05) 0%, transparent 50%),
+url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘200’ height=‘200’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘3’ stitchTiles=‘stitch’/%3E%3CfeColorMatrix values=‘0 0 0 0 0.1, 0 0 0 0 0.08, 0 0 0 0 0.06, 0 0 0 0.06 0’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’/%3E%3C/svg%3E”);
+color: var(–ink);
+line-height: 1.7;
+overflow-x: hidden;
+}
+
+.container {
+max-width: 1100px;
+margin: 0 auto;
+padding: 60px 50px;
+}
+
+/* ============ HERO ============ */
+.hero {
+position: relative;
+padding: 80px 0 100px;
+border-bottom: 2px solid var(–ink);
+margin-bottom: 80px;
+}
+
+.hero::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0;
+width: 100%;
+height: 6px;
+background: var(–crimson);
+}
+
+.hero-meta {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–ink-faded);
+margin-bottom: 60px;
+padding-bottom: 16px;
+border-bottom: 1px solid var(–rule);
+}
+
+.hero-meta-left { display: flex; gap: 40px; }
+.hero-meta-item span { color: var(–crimson); margin-right: 8px; }
+
+.hero-grid {
+display: grid;
+grid-template-columns: 1fr 280px;
+gap: 60px;
+align-items: end;
+}
+
+.hero-eyebrow {
+font-family: ‘DM Serif Display’, serif;
+font-style: italic;
+font-size: 18px;
+color: var(–crimson);
+margin-bottom: 24px;
+letter-spacing: 0.02em;
+}
+
+.hero-title {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 900;
+font-size: clamp(44px, 6vw, 76px);
+line-height: 1.05;
+letter-spacing: -0.01em;
+color: var(–ink);
+margin-bottom: 32px;
+}
+
+.hero-title .accent {
+color: var(–crimson);
+position: relative;
+}
+
+.hero-subtitle {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 400;
+font-size: 18px;
+line-height: 1.7;
+color: var(–ink-soft);
+max-width: 580px;
+border-left: 3px solid var(–crimson);
+padding-left: 20px;
+}
+
+.hero-seal {
+justify-self: end;
+width: 200px;
+height: 200px;
+border: 2px solid var(–crimson);
+border-radius: 8px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+background: var(–crimson);
+color: var(–paper);
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 900;
+text-align: center;
+transform: rotate(-3deg);
+box-shadow: 4px 4px 0 var(–ink);
+position: relative;
+}
+
+.hero-seal::before {
+content: ‘’;
+position: absolute;
+inset: 8px;
+border: 1px solid rgba(244, 237, 224, 0.4);
+border-radius: 4px;
+}
+
+.hero-seal-top {
+font-size: 14px;
+letter-spacing: 0.3em;
+margin-bottom: 12px;
+opacity: 0.85;
+}
+
+.hero-seal-main {
+font-size: 38px;
+line-height: 1;
+letter-spacing: 0.05em;
+}
+
+.hero-seal-sub {
+font-size: 12px;
+margin-top: 14px;
+letter-spacing: 0.2em;
+opacity: 0.75;
+font-family: ‘JetBrains Mono’, monospace;
+font-weight: 500;
+}
+
+/* ============ JUDGMENT CALLOUT ============ */
+.judgment {
+background: var(–ink);
+color: var(–paper);
+padding: 40px 50px;
+margin: 0 -20px 80px;
+position: relative;
+border-radius: 2px;
+}
+
+.judgment::before {
+content: ‘判断’;
+position: absolute;
+top: -14px;
+left: 40px;
+background: var(–crimson);
+color: var(–paper);
+padding: 4px 16px;
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 700;
+font-size: 13px;
+letter-spacing: 0.4em;
+}
+
+.judgment-text {
+font-family: ‘Noto Serif SC’, serif;
+font-size: 19px;
+line-height: 1.75;
+font-weight: 400;
+}
+
+.judgment-text strong {
+color: #f4d35e;
+font-weight: 600;
+}
+
+/* ============ DECISION SECTION ============ */
+.decision {
+margin-bottom: 100px;
+position: relative;
+}
+
+.decision-header {
+display: grid;
+grid-template-columns: 140px 1fr;
+gap: 40px;
+align-items: start;
+margin-bottom: 40px;
+padding-bottom: 24px;
+border-bottom: 1px solid var(–ink);
+}
+
+.decision-id {
+font-family: ‘DM Serif Display’, serif;
+font-size: 110px;
+line-height: 0.85;
+color: var(–crimson);
+font-weight: 400;
+letter-spacing: -0.04em;
+}
+
+.decision-id-sub {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.25em;
+color: var(–ink-faded);
+text-transform: uppercase;
+margin-top: 12px;
+display: block;
+}
+
+.decision-title-block { padding-top: 18px; }
+
+.decision-kicker {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.3em;
+color: var(–crimson);
+text-transform: uppercase;
+margin-bottom: 10px;
+}
+
+.decision-title {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 700;
+font-size: 34px;
+line-height: 1.2;
+color: var(–ink);
+margin-bottom: 18px;
+}
+
+.decision-verdict {
+display: inline-block;
+background: var(–crimson);
+color: var(–paper);
+padding: 8px 18px;
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 600;
+font-size: 15px;
+letter-spacing: 0.05em;
+border-radius: 2px;
+}
+
+.decision-verdict.dark {
+background: var(–ink);
+}
+
+/* ============ CONTENT BLOCKS ============ */
+h3.section-h {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 600;
+font-size: 18px;
+color: var(–ink);
+margin: 32px 0 16px;
+padding-left: 16px;
+border-left: 4px solid var(–gold);
+line-height: 1.4;
+}
+
+p {
+font-size: 16px;
+line-height: 1.85;
+color: var(–ink-soft);
+margin-bottom: 16px;
+}
+
+p strong, li strong {
+color: var(–ink);
+font-weight: 600;
+}
+
+ul, ol {
+margin: 16px 0 24px 0;
+padding-left: 0;
+list-style: none;
+}
+
+ul li, ol li {
+position: relative;
+padding-left: 28px;
+margin-bottom: 12px;
+font-size: 16px;
+line-height: 1.8;
+color: var(–ink-soft);
+}
+
+ul li::before {
+content: ‘’;
+position: absolute;
+left: 8px;
+top: 14px;
+width: 8px;
+height: 8px;
+background: var(–crimson);
+border-radius: 50%;
+}
+
+ol { counter-reset: olc; }
+ol li {
+counter-increment: olc;
+}
+ol li::before {
+content: counter(olc, decimal-leading-zero);
+position: absolute;
+left: 0;
+top: 0;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+color: var(–crimson);
+font-weight: 600;
+letter-spacing: 0.05em;
+}
+
+/* ============ TABLES ============ */
+.table-wrap {
+margin: 32px 0;
+overflow-x: auto;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+font-size: 15px;
+}
+
+thead tr {
+border-bottom: 2px solid var(–ink);
+}
+
+th {
+text-align: left;
+padding: 14px 16px;
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 700;
+font-size: 14px;
+color: var(–ink);
+letter-spacing: 0.03em;
+background: rgba(139, 26, 26, 0.04);
+}
+
+td {
+padding: 16px;
+color: var(–ink-soft);
+border-bottom: 1px solid var(–rule);
+vertical-align: top;
+line-height: 1.65;
+}
+
+td.num {
+font-family: ‘DM Serif Display’, serif;
+font-size: 24px;
+color: var(–crimson);
+font-weight: 400;
+width: 50px;
+text-align: center;
+}
+
+td.label {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 600;
+color: var(–ink);
+}
+
+tr:hover td {
+background: rgba(139, 26, 26, 0.025);
+}
+
+.table-bordered {
+border: 1px solid var(–ink);
+}
+
+/* ============ REASONING BOX ============ */
+.reasoning {
+background: var(–paper-warm);
+border-left: 4px solid var(–ink);
+padding: 24px 28px;
+margin: 24px 0;
+position: relative;
+}
+
+.reasoning-label {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 700;
+font-size: 13px;
+color: var(–crimson);
+letter-spacing: 0.3em;
+margin-bottom: 12px;
+text-transform: uppercase;
+}
+
+.reasoning ul li::before { background: var(–ink); }
+
+/* ============ CORRECTION CALLOUT ============ */
+.correction {
+background: linear-gradient(180deg, var(–paper-deep) 0%, var(–paper-warm) 100%);
+border: 1px dashed var(–crimson);
+padding: 24px 28px;
+margin: 24px 0;
+border-radius: 2px;
+}
+
+.correction-label {
+display: inline-block;
+background: var(–crimson);
+color: var(–paper);
+padding: 4px 12px;
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 700;
+font-size: 12px;
+letter-spacing: 0.2em;
+margin-bottom: 12px;
+}
+
+/* ============ TIMELINE ============ */
+.timeline {
+margin: 32px 0;
+border-top: 1px solid var(–ink);
+border-bottom: 1px solid var(–ink);
+}
+
+.timeline-row {
+display: grid;
+grid-template-columns: 130px 1fr 200px;
+gap: 24px;
+padding: 16px 0;
+border-bottom: 1px solid var(–rule);
+align-items: center;
+}
+
+.timeline-row:last-child { border-bottom: none; }
+
+.timeline-row.key {
+background: rgba(139, 26, 26, 0.06);
+margin: 0 -16px;
+padding: 16px;
+}
+
+.timeline-date {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+color: var(–crimson);
+font-weight: 600;
+letter-spacing: 0.05em;
+}
+
+.timeline-task {
+font-family: ‘Noto Serif SC’, serif;
+font-size: 16px;
+color: var(–ink);
+font-weight: 500;
+}
+
+.timeline-task strong { color: var(–crimson); font-weight: 700; }
+
+.timeline-owner {
+font-size: 13px;
+color: var(–ink-faded);
+text-align: right;
+font-family: ‘JetBrains Mono’, monospace;
+letter-spacing: 0.05em;
+}
+
+/* ============ SUMMARY SEAL ============ */
+.summary {
+margin: 100px 0 80px;
+padding: 60px 50px;
+background: var(–ink);
+color: var(–paper);
+position: relative;
+overflow: hidden;
+}
+
+.summary::before {
+content: ‘’;
+position: absolute;
+top: 0; right: 0;
+width: 200px; height: 200px;
+background: radial-gradient(circle, var(–crimson) 0%, transparent 70%);
+opacity: 0.4;
+}
+
+.summary-label {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+letter-spacing: 0.4em;
+color: var(–crimson-bright);
+margin-bottom: 24px;
+text-transform: uppercase;
+}
+
+.summary-quote {
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 500;
+font-size: 28px;
+line-height: 1.6;
+color: var(–paper);
+border-left: 4px solid var(–crimson-bright);
+padding-left: 24px;
+position: relative;
+z-index: 1;
+}
+
+.summary-quote em {
+font-style: normal;
+color: #f4d35e;
+font-weight: 700;
+}
+
+/* ============ DECISION REQUEST ============ */
+.ask {
+border: 2px solid var(–ink);
+padding: 40px;
+margin: 60px 0;
+position: relative;
+}
+
+.ask::before {
+content: ‘需 你 决 断’;
+position: absolute;
+top: -14px;
+left: 30px;
+background: var(–paper);
+padding: 0 16px;
+font-family: ‘Noto Serif SC’, serif;
+font-weight: 700;
+font-size: 14px;
+letter-spacing: 0.4em;
+color: var(–ink);
+}
+
+.ask-intro {
+font-size: 14px;
+color: var(–ink-faded);
+margin-bottom: 28px;
+font-family: ‘JetBrains Mono’, monospace;
+letter-spacing: 0.05em;
+}
+
+.ask-item {
+display: grid;
+grid-template-columns: 50px 1fr;
+gap: 20px;
+padding: 20px 0;
+border-top: 1px solid var(–rule);
+}
+
+.ask-num {
+font-family: ‘DM Serif Display’, serif;
+font-size: 42px;
+color: var(–crimson);
+line-height: 1;
+}
+
+.ask-q {
+font-family: ‘Noto Serif SC’, serif;
+font-size: 17px;
+line-height: 1.6;
+color: var(–ink);
+}
+
+.ask-q strong { color: var(–crimson); }
+
+/* ============ FOOTER ============ */
+.footer {
+border-top: 2px solid var(–ink);
+padding: 40px 0 60px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.2em;
+color: var(–ink-faded);
+text-transform: uppercase;
+}
+
+.footer-mark {
+font-family: ‘Noto Serif SC’, serif;
+font-size: 14px;
+color: var(–crimson);
+letter-spacing: 0.4em;
+font-weight: 700;
+}
+
+/* ============ FANCY ELEMENTS ============ */
+.vert-text {
+writing-mode: vertical-rl;
+text-orientation: upright;
+font-family: ‘Noto Serif SC’, serif;
+color: var(–crimson);
+font-weight: 700;
+letter-spacing: 0.2em;
+position: absolute;
+font-size: 14px;
+opacity: 0.5;
+}
+
+.hl {
+background: linear-gradient(180deg, transparent 60%, rgba(166, 124, 46, 0.35) 60%);
+padding: 0 2px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+.container { padding: 32px 24px; }
+.hero { padding: 40px 0 60px; margin-bottom: 50px; }
+.hero-grid { grid-template-columns: 1fr; gap: 30px; }
+.hero-meta { flex-direction: column; align-items: flex-start; gap: 12px; }
+.hero-meta-left { flex-direction: column; gap: 8px; }
+.hero-seal { justify-self: start; width: 160px; height: 160px; }
+.hero-seal-main { font-size: 30px; }
+.judgment { padding: 28px; margin: 0 0 50px; }
+.judgment-text { font-size: 16px; }
+.decision { margin-bottom: 60px; }
+.decision-header { grid-template-columns: 80px 1fr; gap: 20px; }
+.decision-id { font-size: 64px; }
+.decision-title { font-size: 24px; }
+.timeline-row { grid-template-columns: 1fr; gap: 8px; }
+.timeline-owner { text-align: left; }
+.summary { padding: 40px 28px; margin: 60px 0 50px; }
+.summary-quote { font-size: 20px; padding-left: 16px; }
+.ask { padding: 28px 24px; }
+.ask-item { grid-template-columns: 36px 1fr; gap: 12px; }
+.ask-num { font-size: 32px; }
+.footer { flex-direction: column; gap: 16px; align-items: flex-start; }
+th, td { padding: 10px 8px; font-size: 13px; }
+}
+
+@media print {
+body { background: white; }
+.hero-seal { break-inside: avoid; }
+.decision { break-inside: avoid; }
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.hero, .judgment, .decision, .summary, .ask {
+animation: fadeUp 0.8s ease both;
+}
+
+.decision:nth-child(odd) { animation-delay: 0.05s; }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ========== HERO ========== -->
+
+  <header class="hero">
+    <div class="hero-meta">
+      <div class="hero-meta-left">
+        <div class="hero-meta-item"><span>FILE</span>GROUP-02 / DECISION-MEMO</div>
+        <div class="hero-meta-item"><span>SCOPE</span>中国近现代史 · 第四章</div>
+        <div class="hero-meta-item"><span>DATE</span>2026·05·09</div>
+      </div>
+      <div class="hero-meta-item"><span>STATUS</span>FINAL DRAFT v1.0</div>
+    </div>
+
+```
+<div class="hero-grid">
+  <div>
+    <div class="hero-eyebrow">— A Decision Memo from the Group Lead</div>
+    <h1 class="hero-title">
+      文物中的<br>
+      <span class="accent">伟大建党精神</span>
+    </h1>
+    <p class="hero-subtitle">
+      基于五月九日小组前期会议议程，组长视角下的全套理性决策方案——主题、文物、形式、分工、动线，及其背后的取舍逻辑。
+    </p>
+  </div>
+
+  <div class="hero-seal">
+    <div class="hero-seal-top">组 长 决 策</div>
+    <div class="hero-seal-main">第二组</div>
+    <div class="hero-seal-sub">2026 / 05 / 09</div>
+  </div>
+</div>
+```
+
+  </header>
+
+  <!-- ========== JUDGMENT ========== -->
+
+  <section class="judgment">
+    <p class="judgment-text">
+      先做一个判断：<strong>当前最大的不确定性是国博"复兴之路"展厅是否开放</strong>。我所有决策都围绕——如何让方案对这个不确定性鲁棒。
+    </p>
+  </section>
+
+  <!-- ========== DECISION 0 ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">0</div>
+        <span class="decision-id-sub">Venue Strategy</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">最关键 · 必须先定</div>
+        <h2 class="decision-title">场馆策略</h2>
+        <span class="decision-verdict">决策：双轨制 + 5 月 10 日截止切换</span>
+      </div>
+    </header>
+
+```
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:80px">方案</th>
+        <th>触发条件</th>
+        <th>主场馆</th>
+        <th>备用</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">A</td>
+        <td>5 / 10 前确认复兴之路重开<br><span style="color:var(--crimson);font-size:12px;font-family:'JetBrains Mono',monospace">[首选]</span></td>
+        <td class="label">国博 · 复兴之路展厅</td>
+        <td>北大红楼</td>
+      </tr>
+      <tr>
+        <td class="num">B</td>
+        <td>5 / 10 仍闭展<br><span style="color:var(--ink-faded);font-size:12px;font-family:'JetBrains Mono',monospace">[兜底]</span></td>
+        <td class="label">北大红楼（核心） + 中共党史展览馆（补充）</td>
+        <td>国博 · 风展红旗如画</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="reasoning">
+  <div class="reasoning-label">为什么不死等国博</div>
+  <ul>
+    <li>改陈已 18 个月，重开时间仍未公布，等待风险过高；</li>
+    <li>文件硬性要求 <strong>"自行拍摄、禁用网图"</strong>，没去到展厅 = 报告做不出来；</li>
+    <li>5 / 16 是暂定参观日，5 / 9 - 5 / 10 必须锁死场馆。</li>
+  </ul>
+</div>
+
+<div class="reasoning">
+  <div class="reasoning-label">为什么 B 轨选北大红楼为核心而非党史馆</div>
+  <ul>
+    <li>北大红楼是第四章 <strong>思想准备阶段</strong> 的实体地标——《新青年》编辑部所在地、李大钊办公地、五四运动策源地，与第四章 4.1 - 4.2 节高度吻合；</li>
+    <li>党史馆体量过大、覆盖范围过宽（1921 至今），反而稀释主题；</li>
+    <li>北大红楼地处东城区五四大街，距国博地铁 4 站，可两馆联动。</li>
+  </ul>
+</div>
+```
+
+  </section>
+
+  <!-- ========== DECISION A ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">A</div>
+        <span class="decision-id-sub">Theme</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">实践主题</div>
+        <h2 class="decision-title">思想火种到红船启航</h2>
+        <span class="decision-verdict">《文物中的伟大建党精神》</span>
+      </div>
+    </header>
+
+```
+<h3 class="section-h">为什么不选"五四精神"</h3>
+<ul>
+  <li>大主题是"中华民族伟大复兴"，建党精神是党史叙事中复兴之路的 <span class="hl">起点</span>，逻辑承接更紧；</li>
+  <li>五四精神侧重思想启蒙，建党精神涵盖"思想觉醒 → 组织诞生 → 道路开辟"完整闭环，更适合 8000 字报告展开；</li>
+  <li>与第四章三节结构天然对应：4.1 思想火种（新文化 + 五四） → 4.2 红船启航（马克思主义传播 + 建党） → 4.3 实践开局（革命新局面）。</li>
+</ul>
+
+<div class="correction">
+  <span class="correction-label">纠 正</span>
+  <p style="margin-bottom:0">
+    原文件示例写"五四精神、伟大建党精神"并列，但二者是 <strong>递进</strong> 而非并列关系——五四是建党的思想准备，建党精神是新民主主义革命的精神之源。报告中要体现这种递进。
+  </p>
+</div>
+```
+
+  </section>
+
+  <!-- ========== DECISION B ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">B</div>
+        <span class="decision-id-sub">Artifacts</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">核心文物 · 聚焦 4-5 件，不贪多</div>
+        <h2 class="decision-title">一书 · 一刊 · 一信 · 一船 · 一像</h2>
+        <span class="decision-verdict">五件骨架</span>
+      </div>
+    </header>
+
+```
+<div class="table-wrap">
+  <table class="table-bordered">
+    <thead>
+      <tr>
+        <th style="width:50px">#</th>
+        <th>文物</th>
+        <th>对应内容</th>
+        <th>A 轨位置</th>
+        <th>B 轨位置</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">1</td>
+        <td class="label">《新青年》杂志<br><span style="font-size:12px;color:var(--ink-faded);font-weight:400">1915 创刊</span></td>
+        <td>新文化运动起点</td>
+        <td>复兴之路</td>
+        <td>北大红楼</td>
+      </tr>
+      <tr>
+        <td class="num">2</td>
+        <td class="label">《共产党宣言》中文首译本<br><span style="font-size:12px;color:var(--ink-faded);font-weight:400">陈望道译，1920</span></td>
+        <td>马克思主义系统传播</td>
+        <td>复兴之路</td>
+        <td>北大红楼</td>
+      </tr>
+      <tr>
+        <td class="num">3</td>
+        <td class="label">李大钊《我的马克思主义观》<br><span style="font-size:12px;color:var(--ink-faded);font-weight:400">手稿 / 刊本</span></td>
+        <td>马克思主义在华传播标志</td>
+        <td>复兴之路</td>
+        <td>北大红楼</td>
+      </tr>
+      <tr>
+        <td class="num">4</td>
+        <td class="label">中共一大会址 / 红船相关展品</td>
+        <td>党的诞生</td>
+        <td>复兴之路</td>
+        <td>党史馆</td>
+      </tr>
+      <tr>
+        <td class="num">5</td>
+        <td class="label">一大代表群像照</td>
+        <td>早期党员先驱</td>
+        <td>复兴之路</td>
+        <td>党史馆</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="reasoning">
+  <div class="reasoning-label">为什么是这 5 件</div>
+  <ul>
+    <li>完整覆盖第四章 4.1 → 4.2 主线（思想 → 组织）；</li>
+    <li>4.3 节（革命新局面）不单独立文物，作为报告"启后"部分简述，避免战线过长；</li>
+    <li>5 件可在 20 分钟汇报中每件 2-3 分钟，节奏合理；</li>
+    <li>全员写感受时，每 2-3 人认领 1 件，分工均匀。</li>
+  </ul>
+</div>
+
+<div class="correction">
+  <span class="correction-label">纠 正</span>
+  <p style="margin-bottom:0">
+    你们的素材里出现了大量 <strong>第三章</strong>（辛亥革命失败、二十一条、新文化运动主要思想流派）和 <strong>第五章</strong>（蒋介石反革命）的展品照片。这些不是第四章范围，写进报告会被判定为"主题不聚焦"。要严格控制在 4.1 - 4.3。
+  </p>
+</div>
+```
+
+  </section>
+
+  <!-- ========== DECISION C ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">C</div>
+        <span class="decision-id-sub">Format</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">展示形式</div>
+        <h2 class="decision-title">PPT（主体）+ 短视频（开场 3 分钟）+ 实践报告</h2>
+        <span class="decision-verdict dark">砍掉：剧本情景剧</span>
+      </div>
+    </header>
+
+```
+<h3 class="section-h">为什么砍掉情景剧</h3>
+<ul>
+  <li>20 分钟硬上限，情景剧排练成本极高（剧本、走位、服化、彩排），收益不确定；</li>
+  <li>12 人组无表演专长成员前提下，情景剧容易翻车，建党题材 <span class="hl">政治严肃性强</span>，演砸代价大；</li>
+  <li>短视频形式更稳——现场拍摄素材天然可用，剪辑是大学生标配技能。</li>
+</ul>
+
+<div class="reasoning">
+  <div class="reasoning-label">视频内容建议（3 分钟）</div>
+  <ol>
+    <li><strong>0:00 - 0:30</strong>　国博 / 红楼外景 + 主题字幕；</li>
+    <li><strong>0:30 - 2:00</strong>　五件文物的现场过场镜头 + 旁白；</li>
+    <li><strong>2:00 - 3:00</strong>　小组成员一句话感悟串联收尾。</li>
+  </ol>
+</div>
+```
+
+  </section>
+
+  <!-- ========== DECISION D ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">D</div>
+        <span class="decision-id-sub">Roles</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">分工 · 12 人重新优化</div>
+        <h2 class="decision-title">职能矩阵</h2>
+        <span class="decision-verdict">合并冗余角色，强化报告写作</span>
+      </div>
+    </header>
+
+```
+<div class="correction">
+  <span class="correction-label">纠 正 原 方 案</span>
+  <ul style="margin-top:8px">
+    <li>"导演 2 人"职能模糊，与剪辑/出镜重叠 → 合并；</li>
+    <li>"实践报告 1-2 人主稿"在 8000 字要求下偏少 → 增加。</li>
+  </ul>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>角色</th>
+        <th style="width:80px;text-align:center">人数</th>
+        <th>职责</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:rgba(139,26,26,0.08)">
+        <td class="label" style="color:var(--crimson)">组长（统筹）</td>
+        <td style="text-align:center;font-weight:700">1</td>
+        <td>你（Derek），项目管理 + 跨组协调</td>
+      </tr>
+      <tr>
+        <td class="label">PPT 制作 + 汇报</td>
+        <td style="text-align:center">2</td>
+        <td>1 人做 PPT，1 人主讲</td>
+      </tr>
+      <tr>
+        <td class="label">实践报告主稿</td>
+        <td style="text-align:center">2</td>
+        <td>分别负责"思想篇"和"建党篇"</td>
+      </tr>
+      <tr>
+        <td class="label">实践报告统稿 + 校对</td>
+        <td style="text-align:center">1</td>
+        <td>风格统一、格式连贯（文件硬性要求）</td>
+      </tr>
+      <tr>
+        <td class="label">现场摄影</td>
+        <td style="text-align:center">2</td>
+        <td>1 人主拍文物，1 人拍过程花絮</td>
+      </tr>
+      <tr>
+        <td class="label">出镜 + 讲解</td>
+        <td style="text-align:center">2</td>
+        <td>视频中讲解文物</td>
+      </tr>
+      <tr>
+        <td class="label">视频导演 + 剪辑</td>
+        <td style="text-align:center">2</td>
+        <td>1 人现场调度，1 人后期剪辑</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="reasoning">
+  <div class="reasoning-label">全员义务</div>
+  <p style="margin-bottom:0">
+    每人至少写 <strong>300 字</strong> 感悟，由统稿人融入报告"文物解码"部分（3000 字要求由此凑足且自然）。
+  </p>
+</div>
+```
+
+  </section>
+
+  <!-- ========== DECISION E ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">E</div>
+        <span class="decision-id-sub">Field Trip</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">现场实践</div>
+        <h2 class="decision-title">5 月 16 日（周六）9:30 - 11:30</h2>
+        <span class="decision-verdict">全员到场</span>
+      </div>
+    </header>
+
+```
+<h3 class="section-h">为什么全员而非现场组</h3>
+<ul>
+  <li>文件要求 <strong>"全员写感受"</strong>，没去过现场的人写不出真实感悟；</li>
+  <li>一次集体行动比拆分多次更高效（地铁通勤单程 1.5 小时）；</li>
+  <li>现场也可作为团建，提升后续协作效率。</li>
+</ul>
+
+<h3 class="section-h">优化原行程</h3>
+<ul>
+  <li>集合时间从 8:00 → <strong>8:15</strong>（沙河昌平线首班车 5:30，8:15 上车足以 9:30 到天安门东，原 8:00 偏早）；</li>
+  <li><strong>若走 B 轨</strong>：地点改为北大红楼（地铁 1 号线王府井站换 6 号线东四站，或公交直达），9:30 - 11:00 北大红楼，下午加场党史馆（8 号线森林公园南门站，可选）。</li>
+</ul>
+```
+
+  </section>
+
+  <!-- ========== DECISION F ========== -->
+
+  <section class="decision">
+    <header class="decision-header">
+      <div>
+        <div class="decision-id">F</div>
+        <span class="decision-id-sub">Timeline</span>
+      </div>
+      <div class="decision-title-block">
+        <div class="decision-kicker">时间表</div>
+        <h2 class="decision-title">基于现状重排</h2>
+        <span class="decision-verdict">5 / 9 — 5 / 26 全周期</span>
+      </div>
+    </header>
+
+```
+<div class="timeline">
+  <div class="timeline-row key">
+    <div class="timeline-date">5 / 09 · 六</div>
+    <div class="timeline-task"><strong>小组会，落实本方案</strong></div>
+    <div class="timeline-owner">全员</div>
+  </div>
+  <div class="timeline-row key">
+    <div class="timeline-date">5 / 10 · 日</div>
+    <div class="timeline-task"><strong>电话核实复兴之路状态，确定 A / B 轨</strong></div>
+    <div class="timeline-owner">组长</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">5 / 10 — 5 / 15</div>
+    <div class="timeline-task">PPT 模板敲定 + 报告"实践背景"撰写 + 拍摄脚本</div>
+    <div class="timeline-owner">后期 + 现场</div>
+  </div>
+  <div class="timeline-row key">
+    <div class="timeline-date">5 / 16 · 六</div>
+    <div class="timeline-task"><strong>实地实践，全员到场</strong></div>
+    <div class="timeline-owner">全员</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">5 / 17 — 5 / 20</div>
+    <div class="timeline-task">报告主稿撰写 + 视频粗剪</div>
+    <div class="timeline-owner">主稿 + 剪辑</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">5 / 21 · 四</div>
+    <div class="timeline-task"><strong>视频剪辑 ddl</strong></div>
+    <div class="timeline-owner">剪辑组</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">5 / 22 — 5 / 23</div>
+    <div class="timeline-task">报告统稿 + PPT 终版 + 汇报彩排</div>
+    <div class="timeline-owner">统稿 + 汇报</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">5 / 23 · 六</div>
+    <div class="timeline-task"><strong>PPT ddl</strong></div>
+    <div class="timeline-owner">PPT 组</div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-date">5 / 24 — 5 / 25</div>
+    <div class="timeline-task">报告 PDF 终稿 + 全员通读</div>
+    <div class="timeline-owner">全员</div>
+  </div>
+  <div class="timeline-row key">
+    <div class="timeline-date">5 / 26 · 二</div>
+    <div class="timeline-task"><strong>课堂汇报 + 报告提交</strong></div>
+    <div class="timeline-owner">全员</div>
+  </div>
+</div>
+```
+
+  </section>
+
+  <!-- ========== SUMMARY ========== -->
+
+  <section class="summary">
+    <div class="summary-label">— ONE-LINE SUMMARY —</div>
+    <p class="summary-quote">
+      主题锁<em>"伟大建党精神"</em>，文物锁<em>"一书一刊一信一船一像"</em>五件，5 / 10 前打电话定场馆走 <em>A 轨</em> 还是 <em>B 轨</em>，5 / 16 全员实地，5 / 26 交付。
+    </p>
+  </section>
+
+  <!-- ========== ASK ========== -->
+
+  <section class="ask">
+    <div class="ask-intro">// 组长不能替你拍板的两件事</div>
+    <div class="ask-item">
+      <div class="ask-num">1</div>
+      <div class="ask-q">
+        备用场馆是 <strong>北大红楼为主</strong>（我的推荐）<br>
+        还是 <strong>党史展览馆为主</strong> ？
+      </div>
+    </div>
+    <div class="ask-item">
+      <div class="ask-num">2</div>
+      <div class="ask-q">
+        视频是 <strong>3 分钟开场版</strong>（推荐）<br>
+        还是 <strong>完整 5 - 8 分钟版</strong>（更耗剪辑工时）？
+      </div>
+    </div>
+    <p style="margin-top:28px;font-size:14px;color:var(--ink-faded);font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;border-top:1px solid var(--rule);padding-top:20px">
+      → 确认后即可生成明日会议主持稿与群通知。
+    </p>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+
+  <footer class="footer">
+    <div>Group 02 · 中国共产党成立和中国革命新局面</div>
+    <div class="footer-mark">— 第 二 组 —</div>
+    <div>Decision Memo · v1.0</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
